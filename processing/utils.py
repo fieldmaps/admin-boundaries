@@ -11,8 +11,9 @@ logging.basicConfig(level=logging.INFO,
 cwd = Path(__file__).parent
 cfg = ConfigParser()
 cfg.read((cwd / '../config.ini').resolve())
-adm0 = cfg['inputs_adm0']
-admx = cfg['inputs_admx']
+adm0 = cfg['adm0']
+voronoi = cfg['voronoi']
+attributes = cfg['attributes']
 
 
 def is_polygon(file):

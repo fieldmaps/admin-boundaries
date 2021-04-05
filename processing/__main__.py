@@ -1,13 +1,13 @@
 from pathlib import Path
 from multiprocessing import Pool
-from . import (inputs_admx, inputs_adm0, clip, merge, merge_cleanup,
+from . import (inputs_adm0, inputs_voronoi, clip, merge, merge_cleanup,
                polygons, lines, points, outputs, outputs_cleanup)
 from .utils import apply_funcs, is_polygon, adm0
 
 ext = ['.shp', '.geojson', '.gpkg']
 cwd = Path(__file__).parent
-files = sorted((cwd / '../inputs_admx').iterdir())
-pre_funcs = [inputs_admx.main, clip.main]
+files = sorted((cwd / '../inputs_voronoi').iterdir())
+pre_funcs = [inputs_voronoi.main, clip.main]
 geometries = ['polygons', 'lines', 'points']
 
 
@@ -24,7 +24,7 @@ def import_adm0():
         result.get()
 
 
-def import_admx():
+def import_voronoi():
     results = []
     pool = Pool()
     for file in files:
@@ -96,7 +96,7 @@ def export_all():
 
 if __name__ == '__main__':
     import_adm0()
-    import_admx()
+    import_voronoi()
     merge_all()
     polygon_processing()
     line_point_processing()

@@ -29,15 +29,15 @@ def main(name, file):
     con = connect(database='edge_matcher')
     cur = con.cursor()
     query_1 = """
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {fid} VARCHAR;
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm0} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm0_fid} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm0_id} VARCHAR;
     """
     query_2 = """
         DROP TABLE IF EXISTS {table_out};
         CREATE TABLE {table_out} AS
         SELECT
-            {fid} AS adm0_fid,
-            {adm0} AS adm0_id,
+            {adm0_fid} AS adm0_fid,
+            {adm0_id} AS adm0_id,
             ST_Transform(ST_Multi(
                 ST_CollectionExtract(ST_MakeValid(
                     ST_Force2D(ST_SnapToGrid(geom, 0.000000001))
@@ -50,13 +50,13 @@ def main(name, file):
     """
     geom_name, geom_code = geometries[name]
     cur.execute(SQL(query_1).format(
-        fid=Identifier(adm0['fid']),
-        adm0=Identifier(adm0['adm0']),
+        adm0_fid=Identifier(adm0['adm0_fid']),
+        adm0_id=Identifier(adm0['adm0_id']),
         table_in=Identifier(f'{name}_tmp1'),
     ))
     cur.execute(SQL(query_2).format(
-        fid=Identifier(adm0['fid']),
-        adm0=Identifier(adm0['adm0']),
+        adm0_fid=Identifier(adm0['adm0_fid']),
+        adm0_id=Identifier(adm0['adm0_id']),
         geom_code=Literal(geom_code),
         geom_name=Identifier(geom_name),
         table_in=Identifier(f'{name}_tmp1'),
