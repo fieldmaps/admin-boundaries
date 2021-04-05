@@ -14,6 +14,7 @@ def main(name, file):
         '-lco', 'FID=fid',
         '-lco', 'GEOMETRY_NAME=geom',
         '-lco', 'LAUNDER=NO',
+        '-lco', 'SPATIAL_INDEX=NONE',
         '-nlt', 'PROMOTE_TO_MULTI',
         '-nln', f'{name}_tmp1',
         '-f', 'PostgreSQL', 'PG:dbname=edge_matcher',
@@ -22,50 +23,49 @@ def main(name, file):
     con = connect(database='edge_matcher')
     cur = con.cursor()
     query_1 = """
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {id_0} VARCHAR;
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {id_1} VARCHAR;
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {id_2} VARCHAR;
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {id_3} VARCHAR;
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {id_4} VARCHAR;
-        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {id_5} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm0} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm1} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm2} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm3} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm4} VARCHAR;
+        ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS {adm5} VARCHAR;
     """
     query_2 = """
         DROP TABLE IF EXISTS {table_out};
         CREATE TABLE {table_out} AS
         SELECT
-            {id_0} AS id_0,
-            {id_1} AS id_1,
-            {id_2} AS id_2,
-            {id_3} AS id_3,
-            {id_4} AS id_4,
-            {id_5} AS id_5,
+            {adm0} AS adm0_id,
+            {adm1} AS adm1_id,
+            {adm2} AS adm2_id,
+            {adm3} AS adm3_id,
+            {adm4} AS adm4_id,
+            {adm5} AS adm5_id,
             ST_Transform(ST_Multi(
-                ST_Force2D(ST_MakeValid(
-                    ST_SnapToGrid(geom, 0.000000001)
-                ))
-            ), 4326)::GEOMETRY(MultiPolygon, 4326) as geom
+                ST_CollectionExtract(ST_MakeValid(
+                    ST_Force2D(ST_SnapToGrid(geom, 0.000000001))
+                ), 3)
+            ), 4326)::GEOMETRY(MultiPolygon, 4326) AS geom
         FROM {table_in};
-        CREATE INDEX ON {table_out} USING GIST(geom);
     """
     drop_tmp = """
         DROP TABLE IF EXISTS {table_tmp1};
     """
     cur.execute(SQL(query_1).format(
-        id_0=Identifier(admx['adm0']),
-        id_1=Identifier(admx['adm1']),
-        id_2=Identifier(admx['adm2']),
-        id_3=Identifier(admx['adm3']),
-        id_4=Identifier(admx['adm4']),
-        id_5=Identifier(admx['adm5']),
+        adm0=Identifier(admx['adm0']),
+        adm1=Identifier(admx['adm1']),
+        adm2=Identifier(admx['adm2']),
+        adm3=Identifier(admx['adm3']),
+        adm4=Identifier(admx['adm4']),
+        adm5=Identifier(admx['adm5']),
         table_in=Identifier(f'{name}_tmp1'),
     ))
     cur.execute(SQL(query_2).format(
-        id_0=Identifier(admx['adm0']),
-        id_1=Identifier(admx['adm1']),
-        id_2=Identifier(admx['adm2']),
-        id_3=Identifier(admx['adm3']),
-        id_4=Identifier(admx['adm4']),
-        id_5=Identifier(admx['adm5']),
+        adm0=Identifier(admx['adm0']),
+        adm1=Identifier(admx['adm1']),
+        adm2=Identifier(admx['adm2']),
+        adm3=Identifier(admx['adm3']),
+        adm4=Identifier(admx['adm4']),
+        adm5=Identifier(admx['adm5']),
         table_in=Identifier(f'{name}_tmp1'),
         table_out=Identifier(f'{name}_00'),
     ))
