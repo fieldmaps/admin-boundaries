@@ -1,13 +1,15 @@
 from pathlib import Path
 from multiprocessing import Pool
-from . import (inputs_adm0, inputs_voronoi, clip, merge, merge_cleanup,
-               polygons, lines, points, outputs, outputs_cleanup)
+from . import (inputs_adm0, inputs_voronoi, inputs_attributes, clip, merge,
+               merge_cleanup, polygons, lines, points, outputs, outputs_cleanup)
 from .utils import apply_funcs, is_polygon, adm0
 
-ext = ['.shp', '.geojson', '.gpkg']
+geo_ext = ['.gpkg', '.shp', '.geojson']
+db_ext = ['.db', '.sqlite', '.sqlite3', '.xlsx']
 cwd = Path(__file__).parent
-files = sorted((cwd / '../inputs_voronoi').iterdir())
-pre_funcs = [inputs_voronoi.main, clip.main]
+files_voronoi = sorted((cwd / '../inputs_voronoi').iterdir())
+files_attributes = sorted((cwd / '../inputs_attributes').iterdir())
+voronoi_funcs = [inputs_voronoi.main, clip.main]
 geometries = ['polygons', 'lines', 'points']
 
 
@@ -27,9 +29,9 @@ def import_adm0():
 def import_voronoi():
     results = []
     pool = Pool()
-    for file in files:
-        if file.is_file() and file.suffix in ext and is_polygon(file):
-            args = [file.name.replace('.', '_'), file, *pre_funcs]
+    for file in files_voronoi:
+        if file.is_file() and file.suffix in geo_ext and is_polygon(file):
+            args = [file.name.replace('.', '_'), file, *voronoi_funcs]
             result = pool.apply_async(apply_funcs, args=args)
             results.append(result)
     pool.close()
@@ -38,10 +40,18 @@ def import_voronoi():
         result.get()
 
 
+def import_attributes():
+    files = []
+    for file in files_attributes:
+        if file.is_file() and file.suffix in db_ext:
+            files.append(file)
+    inputs_attributes.main(files)
+
+
 def merge_all():
     layers = []
-    for file in files:
-        if file.is_file() and file.suffix in ext and is_polygon(file):
+    for file in files_voronoi:
+        if file.is_file() and file.suffix in geo_ext and is_polygon(file):
             layers.append(file.name.replace('.', '_'))
     merge.main(layers)
     merge_cleanup.main(layers)
@@ -97,6 +107,7 @@ def export_all():
 if __name__ == '__main__':
     import_adm0()
     import_voronoi()
+    import_attributes()
     merge_all()
     polygon_processing()
     line_point_processing()
