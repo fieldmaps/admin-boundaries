@@ -1,5 +1,6 @@
 import re
 import logging
+from psycopg2.sql import SQL, Literal
 from subprocess import run
 from configparser import ConfigParser
 from pathlib import Path
@@ -14,6 +15,16 @@ cfg.read((cwd / '../config.ini').resolve())
 adm0 = cfg['adm0']
 voronoi = cfg['voronoi']
 attributes = cfg['attributes']
+
+
+def table_exists(cur, table):
+    query = """
+        SELECT COUNT(*)
+        FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = {table}
+    """
+    cur.execute(SQL(query).format(table=Literal(table)))
+    return cur.fetchone()[0] == 1
 
 
 def is_polygon(file):

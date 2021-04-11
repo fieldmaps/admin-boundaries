@@ -100,7 +100,7 @@ def export_all():
     pool.join()
     for result in results:
         result.get()
-    outputs_cleanup.main(range(6), geometries)
+    outputs_cleanup.main(range(6), geometries + ['attributes'])
     outputs_cleanup.main(['x'], ['polygons'])
 
 

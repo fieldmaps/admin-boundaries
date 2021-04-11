@@ -17,13 +17,13 @@ def parse_excel(file):
         if table in sheets.sheet_names:
             df = pd.read_excel(file, table).rename(
                 columns={attributes[f'adm{level}_id']: f'adm{level}_id'})
-            df.to_sql(f'attributes_adm{level}', con=engine,
+            df.to_sql(f'adm{level}_attributes', con=engine,
                       if_exists='append', index=False, method='multi')
 
 
 def sqlite_table_exists(table, cur):
     query = f"""
-        SELECT count(name)
+        SELECT COUNT(*)
         FROM sqlite_master
         WHERE type='table' AND name='{table}'
     """
@@ -39,7 +39,7 @@ def parse_sqlite(file):
         if sqlite_table_exists(table, cur):
             df = pd.read_sql_query(f"SELECT * FROM {table}", con).rename(
                 columns={attributes[f'adm{level}_id']: f'adm{level}_id'})
-            df.to_sql(f'attributes_adm{level}', con=engine,
+            df.to_sql(f'adm{level}_attributes', con=engine,
                       if_exists='append', index=False, method='multi')
     cur.close()
     con.close()
@@ -58,12 +58,12 @@ def main(files):
         DROP TABLE IF EXISTS {table_adm5};
     """
     cur.execute(SQL(drop_tmp).format(
-        table_adm0=Identifier(f'attributes_adm0'),
-        table_adm1=Identifier(f'attributes_adm1'),
-        table_adm2=Identifier(f'attributes_adm2'),
-        table_adm3=Identifier(f'attributes_adm3'),
-        table_adm4=Identifier(f'attributes_adm4'),
-        table_adm5=Identifier(f'attributes_adm5'),
+        table_adm0=Identifier(f'adm0_attributes'),
+        table_adm1=Identifier(f'adm1_attributes'),
+        table_adm2=Identifier(f'adm2_attributes'),
+        table_adm3=Identifier(f'adm3_attributes'),
+        table_adm4=Identifier(f'adm4_attributes'),
+        table_adm5=Identifier(f'adm5_attributes'),
     ))
     con.commit()
     cur.close()

@@ -12,7 +12,6 @@ def main(layers):
     query_1 = """
         DROP TABLE IF EXISTS {table_out};
         CREATE TABLE {table_out} (
-            adm0_fid varchar,
             adm0_id varchar,
             adm1_id varchar,
             adm2_id varchar,
@@ -32,8 +31,7 @@ def main(layers):
             adm5_id,
             geom
         )
-        SELECT *
-        FROM {table_in};
+        SELECT * FROM {table_in};
     """
     query_3 = """
         DROP TABLE IF EXISTS {table_out};
@@ -42,7 +40,6 @@ def main(layers):
         FROM {table_in1}
         UNION ALL
         SELECT
-            a.adm0_fid,
             a.adm0_id,
             NULL AS adm1_id,
             NULL AS adm2_id,
@@ -53,7 +50,7 @@ def main(layers):
         FROM {table_in2} AS a
         LEFT JOIN {table_in1} AS b
         ON a.adm0_id = b.adm0_id
-        WHERE b.adm0_id IS NULL
+        WHERE b.adm0_id IS NULL;
     """
     drop_tmp = """
         DROP TABLE IF EXISTS {table_tmp1};

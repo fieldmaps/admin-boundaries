@@ -1,6 +1,7 @@
 from psycopg2 import connect
 from psycopg2.sql import SQL, Identifier
-from .utils import logging
+from .attribute_queries import queries
+from .utils import logging, table_exists
 
 logger = logging.getLogger(__name__)
 
@@ -22,14 +23,25 @@ def main(level):
         ON a.{id} = b.{id}
         GROUP BY {ids};
     """
+    drop_tmp = """
+        DROP TABLE IF EXISTS {table_tmp1};
+    """
     ids = map(lambda x: f'adm{x}_id', range(level))
-    cur.execute(SQL(query_1).format(
-        table_in1=Identifier(f'adm{level}_polygons'),
-        table_in2=Identifier(f'adm{level-1}_polygons'),
-        ids=SQL(',').join(map(lambda x: Identifier('a', x), ids)),
-        id=Identifier(f'adm{level-1}_id'),
-        table_out=Identifier(f'adm{level}_lines'),
-    ))
+    if table_exists(cur, f'adm{level}_attributes'):
+        cur.execute(SQL(query_1).format(
+            table_in1=Identifier(f'adm{level}_polygons'),
+            table_in2=Identifier(f'adm{level-1}_polygons'),
+            ids=SQL(',').join(map(lambda x: Identifier('a', x), ids)),
+            id=Identifier(f'adm{level-1}_id'),
+            table_out=Identifier(f'adm{level}_lines_tmp1'),
+        ))
+        cur.execute(SQL(queries[level-1]).format(
+            table_in=Identifier(f'adm{level}_lines_tmp1'),
+            table_out=Identifier(f'adm{level}_lines'),
+        ))
+        cur.execute(SQL(drop_tmp).format(
+            table_tmp1=Identifier(f'adm{level}_lines_tmp1'),
+        ))
     con.commit()
     cur.close()
     con.close()
