@@ -1,5 +1,5 @@
 services:
-  polygon-voronoi:
+  edge-matcher:
     build: .
     volumes:
       - ./inputs:/usr/src/app/inputs

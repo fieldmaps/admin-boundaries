@@ -1,23 +1,21 @@
 import pandas as pd
-from sqlalchemy import create_engine
 import sqlite3
 from psycopg2 import connect
 from psycopg2.sql import SQL, Identifier
-from .utils import attributes, logging
+from .utils import attributes, logging, DATABASE
 
 logger = logging.getLogger(__name__)
-engine_string = 'postgresql://localhost/edge_matcher'
+con = f'postgresql:///{DATABASE}'
 
 
 def parse_excel(file):
-    engine = create_engine(engine_string)
     sheets = pd.ExcelFile(file)
     for level in range(6):
         table = attributes[f'adm{level}_table']
         if table in sheets.sheet_names:
-            df = pd.read_excel(file, table).rename(
+            df = pd.read_excel(file, table, engine='openpyxl').rename(
                 columns={attributes[f'adm{level}_id']: f'adm{level}_id'})
-            df.to_sql(f'adm{level}_attributes', con=engine,
+            df.to_sql(f'adm{level}_attributes', con=con,
                       if_exists='append', index=False, method='multi')
 
 
@@ -31,7 +29,6 @@ def sqlite_table_exists(table, cur):
 
 
 def parse_sqlite(file):
-    engine = create_engine(engine_string)
     con = sqlite3.connect(file)
     cur = con.cursor()
     for level in range(6):
@@ -39,7 +36,7 @@ def parse_sqlite(file):
         if sqlite_table_exists(table, cur):
             df = pd.read_sql_query(f"SELECT * FROM {table}", con).rename(
                 columns={attributes[f'adm{level}_id']: f'adm{level}_id'})
-            df.to_sql(f'adm{level}_attributes', con=engine,
+            df.to_sql(f'adm{level}_attributes', con=con,
                       if_exists='append', index=False, method='multi')
     cur.close()
     con.close()
@@ -47,7 +44,7 @@ def parse_sqlite(file):
 
 def main(files):
     logger.info(f'Starting attributes')
-    con = connect(database='edge_matcher')
+    con = connect(database=DATABASE)
     cur = con.cursor()
     drop_tmp = """
         DROP TABLE IF EXISTS {table_adm0};

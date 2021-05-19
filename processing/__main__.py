@@ -7,8 +7,8 @@ from .utils import apply_funcs, is_polygon, adm0
 geo_ext = ['.gpkg', '.shp', '.geojson']
 db_ext = ['.db', '.sqlite', '.sqlite3', '.xlsx']
 cwd = Path(__file__).parent
-files_voronoi = sorted((cwd / '../inputs_voronoi').iterdir())
-files_attributes = sorted((cwd / '../inputs_attributes').iterdir())
+files_voronoi = sorted((cwd / '../inputs/voronoi').iterdir())
+files_attributes = sorted((cwd / '../inputs/attributes').iterdir())
 voronoi_funcs = [inputs_voronoi.main, clip.main]
 geometries = ['polygons', 'lines', 'points']
 
@@ -17,7 +17,7 @@ def import_adm0():
     results = []
     pool = Pool()
     for geometry in geometries:
-        args = [f'adm0_{geometry}', cwd / f'../inputs_adm0/{adm0[geometry]}']
+        args = [f'adm0_{geometry}', cwd / f'../inputs/adm0/{adm0[geometry]}']
         result = pool.apply_async(inputs_adm0.main, args=args)
         results.append(result)
     pool.close()

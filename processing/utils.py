@@ -9,6 +9,8 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
+DATABASE = 'edge_matcher'
+
 cwd = Path(__file__).parent
 cfg = ConfigParser()
 cfg.read((cwd / '../config.ini').resolve())
