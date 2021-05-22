@@ -1,9 +1,5 @@
-import re
 import logging
-from psycopg2.sql import SQL, Literal
-from subprocess import run
-from configparser import ConfigParser
-from pathlib import Path
+import requests
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
@@ -11,30 +7,31 @@ logging.basicConfig(level=logging.INFO,
 
 DATABASE = 'edge_matcher'
 
-cwd = Path(__file__).parent
-cfg = ConfigParser()
-cfg.read((cwd / '../config.ini').resolve())
-adm0 = cfg['adm0']
-voronoi = cfg['voronoi']
-attributes = cfg['attributes']
+geoms = ['lines', 'points', 'polygons']
+srcs = ['cod', 'geoboundaries']
+
+adm0_list = {}
+for src in srcs:
+    meta = requests.get(f'https://data.fieldmaps.io/{src}/meta.json').json()
+    adm0_list[src] = list(
+        filter(lambda x: x['adm_full'] is not None and x['adm_full'] >= 1,
+               meta)
+    )
 
 
-def table_exists(cur, table):
-    query = """
-        SELECT COUNT(*)
-        FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_name = {table}
-    """
-    cur.execute(SQL(query).format(table=Literal(table)))
-    return cur.fetchone()[0] == 1
-
-
-def is_polygon(file):
-    regex = re.compile(r'\((Multi Polygon|Polygon)\)')
-    result = run(['ogrinfo', file], capture_output=True)
-    return regex.search(str(result.stdout))
-
-
-def apply_funcs(name, file, *args):
+def apply_funcs(src, name, level, *args):
     for func in args:
-        func(name, file)
+        func(src, name, level)
+
+
+def get_ids(level):
+    ids = []
+    for l in range(level, -1, -1):
+        ids.extend([
+            f'adm{l}_id',
+            f'adm{l}_src',
+            f'adm{l}_name',
+            f'adm{l}_name1',
+            f'adm{l}_name2',
+        ])
+    return ids
