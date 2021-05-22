@@ -24,7 +24,8 @@ query_1 = """
         )::GEOMETRY(MultiPolygon, 4326) as geom
     FROM {table_in1} AS a
     JOIN {table_in2} AS b
-    ON ST_Overlaps(a.geom, b.geom)
+    ON ST_Intersects(a.geom, b.geom)
+    AND NOT ST_Within(a.geom, b.geom)
     WHERE b.id = {id};
 """
 query_2 = """
