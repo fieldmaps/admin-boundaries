@@ -9,14 +9,28 @@ DATABASE = 'edge_matcher'
 
 geoms = ['lines', 'points', 'polygons']
 srcs = ['cod', 'geoboundaries']
+dests = ['open', 'humanitarian']
 
-adm0_list = {}
+src_list = {}
 for src in srcs:
     meta = requests.get(f'https://data.fieldmaps.io/{src}/meta.json').json()
-    adm0_list[src] = list(
+    src_list[src] = list(
         filter(lambda x: x['adm_full'] is not None and x['adm_full'] >= 1,
                meta)
     )
+
+dest_list = {}
+dest_list['open'] = {}
+for row in src_list['geoboundaries']:
+    row['src'] = 'geoboundaries'
+    dest_list['open'][row['id']] = row
+dest_list['humanitarian'] = {**dest_list['open']}
+for row in src_list['cod']:
+    row['src'] = 'cod'
+    dest_list['humanitarian'][row['id']] = row
+
+dest_list['open'] = dest_list['open'].values()
+dest_list['humanitarian'] = dest_list['humanitarian'].values()
 
 
 def apply_funcs(src, name, level, *args):
