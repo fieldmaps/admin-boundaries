@@ -2,8 +2,7 @@ from pathlib import Path
 from multiprocessing import Pool
 from . import (inputs_adm0, inputs, polygons, lines, points,
                outputs, cleanup, cleanup_adm0, merge, formats)
-from .utils import (logging, apply_funcs, srcs,
-                    src_list, dests, dest_list, geoms)
+from .utils import (logging, apply_funcs, srcs, src_list, dests, geoms)
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent

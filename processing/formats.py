@@ -15,18 +15,6 @@ def export_gpkg(outputs, name):
         z.write(file, file.name)
 
 
-def export_shp(outputs, name):
-    file = (outputs / f'{name}.shp.zip').resolve()
-    file.unlink(missing_ok=True)
-    subprocess.run([
-        'ogr2ogr',
-        '-overwrite',
-        '-lco', 'ENCODING=UTF-8',
-        file,
-        (outputs / f'{name}.gpkg').resolve(),
-    ])
-
-
 def export_multi(outputs, name, ext):
     file = (outputs / f'{name}.{ext}').resolve()
     file.unlink(missing_ok=True)
@@ -48,5 +36,4 @@ def main(dest, geom):
     name = f'adm_{geom}'
     export_gpkg(outputs, name)
     export_multi(outputs, name, 'xlsx')
-    export_shp(outputs, name)
     logger.info(f'{dest}_{geom}')
