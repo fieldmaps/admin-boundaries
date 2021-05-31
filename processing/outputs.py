@@ -8,7 +8,7 @@ cwd = Path(__file__).parent
 
 
 def main(src, name, level):
-    outputs = (cwd / f'../../outputs/{src}').resolve()
+    outputs = (cwd / f'../data/{src}/clipped').resolve()
     outputs.mkdir(exist_ok=True, parents=True)
     output = (outputs / f'{name}.gpkg').resolve()
     output.unlink(missing_ok=True)

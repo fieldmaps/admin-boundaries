@@ -7,7 +7,7 @@ cwd = Path(__file__).parent
 
 
 def main(src, name, level):
-    file = (cwd / f'../../inputs/{src}/{name}.gpkg').resolve()
+    file = (cwd / f'../data/{src}/extended/{name}.gpkg').resolve()
     subprocess.run([
         'ogr2ogr',
         '-overwrite',

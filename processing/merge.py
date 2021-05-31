@@ -4,19 +4,18 @@ from .utils import logging, dest_list
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
-inputs = (cwd / '../inputs').resolve()
-outputs = (cwd / '../outputs').resolve()
+data = (cwd / '../data').resolve()
 
 
 def cleanup(dest, geom):
-    output = (outputs / f'{dest}/adm_{geom}.gpkg')
+    output = (data / f'edge-matched/{dest}/adm_{geom}.gpkg')
     output.unlink(missing_ok=True)
     logger.info(f'{dest}_{geom}')
 
 
 def main(dest, geom):
-    file_adm0 = (inputs / f'adm0/adm0_{geom}.gpkg')
-    output = (outputs / f'{dest}/adm_{geom}.gpkg')
+    file_adm0 = (data / f'adm0/adm0_{geom}.gpkg')
+    output = (data / f'edge-matched/{dest}/adm_{geom}.gpkg')
     output.unlink(missing_ok=True)
     subprocess.run([
         'ogr2ogr',
@@ -27,8 +26,8 @@ def main(dest, geom):
         file_adm0,
     ])
     for row in dest_list[dest]:
-        file = (outputs / f"{row['src']}/{row['id']}.gpkg")
-        for level in range(1, row['adm_full'] + 1):
+        file = (data / f"{row['src']}/clipped/{row['id']}.gpkg")
+        for level in range(1, row['lvl_full'] + 1):
             subprocess.run([
                 'ogr2ogr',
                 '-append',

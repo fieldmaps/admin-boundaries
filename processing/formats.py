@@ -32,7 +32,7 @@ def export_multi(outputs, name, ext):
 
 
 def main(dest, geom):
-    outputs = (cwd / f'../outputs/{dest}').resolve()
+    outputs = (cwd / f'../data/edge-matched/{dest}').resolve()
     name = f'adm_{geom}'
     export_gpkg(outputs, name)
     export_multi(outputs, name, 'xlsx')

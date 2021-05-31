@@ -14,8 +14,8 @@ def import_boundaries():
     results = []
     pool = Pool()
     for src in srcs:
-        for row in src_list[src]:
-            args = [src, row['id'], row['adm_full'], *funcs]
+        for row in src_list[f'{src}_clip']:
+            args = [src, row['id'], row['lvl_full'], *funcs]
             result = pool.apply_async(apply_funcs, args=args)
             results.append(result)
     pool.close()
