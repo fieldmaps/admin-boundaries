@@ -19,9 +19,9 @@ def import_adm0(geom):
         '-f', 'PostgreSQL', f'PG:dbname={DATABASE}',
         file,
     ])
+    logger.info(f'adm0_{geom}')
 
 
 def main():
     for geom in geoms:
         import_adm0(geom)
-    logger.info('adm0')

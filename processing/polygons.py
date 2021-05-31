@@ -36,7 +36,7 @@ query_2 = """
         ST_Multi(
             ST_Union(geom)
         )::GEOMETRY(MultiPolygon, 4326) AS geom
-    FROM {table_in}
+    FROM {table_in} AS a
     GROUP BY {ids};
 """
 
@@ -47,14 +47,14 @@ def main(src, name, level):
     cur.execute(SQL(query_1).format(
         table_in1=Identifier(f'{src}_{name}_adm{level}_voronoi'),
         table_in2=Identifier('adm0_polygons'),
-        ids=SQL(',').join(map(Identifier, get_ids(level))),
+        ids=SQL(',').join(map(lambda x: Identifier('a', x), get_ids(level))),
         id=Literal(name),
         table_out=Identifier(f'{src}_{name}_adm{level}_polygons'),
     ))
     for l in range(level-1, -1, -1):
         cur.execute(SQL(query_2).format(
             table_in=Identifier(f'{src}_{name}_adm{l+1}_polygons'),
-            ids=SQL(',').join(map(Identifier, get_ids(l))),
+            ids=SQL(',').join(map(lambda x: Identifier('a', x), get_ids(l))),
             table_out=Identifier(f'{src}_{name}_adm{l}_polygons'),
         ))
     con.commit()

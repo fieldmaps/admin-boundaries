@@ -4,17 +4,24 @@ import subprocess
 cwd = Path(__file__).parent
 srcs = ['cod', 'geoboundaries']
 grps = ['extended', 'clipped']
-outputs = ['open', 'humanitarian']
+outputs = ['humanitarian', 'open']
 
 if __name__ == '__main__':
     subprocess.run([
         's3cmd', 'sync',
         '--acl-public',
         '--delete-removed',
-        '--dry-run',
         '--rexclude', '\/\.',
-        (cwd / f'data/adm0').resolve(),
-        f's3://fieldmapsdata/',
+        (cwd / f'data/edge-matched.json').resolve(),
+        f's3://fieldmapsdata/edge-matched.json',
+    ])
+    subprocess.run([
+        's3cmd', 'sync',
+        '--acl-public',
+        '--delete-removed',
+        '--rexclude', '^\.',
+        f"{(cwd / f'data/adm0').resolve()}/",
+        f's3://fieldmapsdata/adm0/',
     ])
     for output in outputs:
         subprocess.run([

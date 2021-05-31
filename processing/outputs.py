@@ -20,6 +20,7 @@ def main(src, name, level):
                 'ogr2ogr',
                 '-overwrite',
                 '-makevalid',
+                '-mapFieldType', 'DateTime=Date',
                 '-nln', f'{name}_adm{l}_{geom}',
                 output,
                 f'PG:dbname={DATABASE}', f'{src}_{name}_adm{l}_{geom}',

@@ -1,7 +1,7 @@
 from pathlib import Path
 from multiprocessing import Pool
 from . import (inputs_adm0, inputs, polygons, lines, points,
-               outputs, cleanup, cleanup_adm0, merge, formats)
+               outputs, cleanup, cleanup_adm0, merge, formats, meta)
 from .utils import (logging, apply_funcs, srcs, src_list, dests, geoms)
 
 logger = logging.getLogger(__name__)
@@ -45,3 +45,4 @@ if __name__ == '__main__':
     outputs_merge(merge.main)
     outputs_merge(formats.main)
     outputs_merge(merge.cleanup)
+    meta.main()
