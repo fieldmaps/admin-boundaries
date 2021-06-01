@@ -37,7 +37,7 @@ Being the last stage of a multi-step pipeline, other related repositories are in
 
 1. Originals: Represents data as collected from the source. For some layers these are downloaded manually from web portals. For others, programatic API access is available.
 2. Normalized: Within a single source group, there may be small variations in the way layers are formatted. This stage performs operations to ensure file, layer, and attribute names are consistent within the same source group.
-3. Standardized: Between multiple source groups, this step conditions attributes in a common format suitable for merging together in a hybrid dataset. Here, versioned ID's are assigned to each admin area.
+3. Standardized: Between multiple source groups, this step conditions attributes in a common format suitable for merging together in a hybrid dataset. Here, versioned IDs are assigned to each admin area.
 4. Extended: To resolve gaps between layers, a voronoi-like algorithm is applied along polygon edges to extend them outward. The extent of the resulting polygon is 100% larger in each direction, purposefully over-sized for later clipping.
 5. Clipped: To resolve overlaps between layers, extended layers are clipped to a pre-defined ADM0 layer.
 6. Edge-Matched: An aggregation of all clipped layers are assembled into the final output.
@@ -93,15 +93,15 @@ Each layer from ADM1 to ADM4 contains the following list of attributes.
 
 The ADM0 layer has its own attribute fields distinct from the different source layers.
 
-| Field Name | Field Description                                                                                                                               |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| id         | Unique ID for admin area based on ISO alpha-3 code, some ADM0's are broken up to provide additional labels for islands and other distinct areas |
-| iso3       | ISO 3166-1 alpha-3 code                                                                                                                         |
-| iso2       | ISO 3166-1 alpha-2 code                                                                                                                         |
-| name       | Name for use in charts and reports                                                                                                              |
-| label      | Name for use in map labels                                                                                                                      |
-| color      | Thematic grouping of admin areas with separate IDs                                                                                              |
-| region_cd  | Region code of admin area (AME, EUR, AFR, etc)                                                                                                  |
-| region_nm  | Region name of admin area (Americas, Europe, Africa, etc)                                                                                       |
-| status_cd  | Status code of admin area (1, 5, 7, etc)                                                                                                        |
-| status_nm  | Status name of admin area (State, Territory, Autonomous Region, etc)                                                                            |
+| Field Name | Field Description                                                                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| id         | Unique ID for admin area based on ISO alpha-3 code, some ADM0s are broken up to provide additional labels for islands and other distinct areas |
+| iso3       | ISO 3166-1 alpha-3 code                                                                                                                        |
+| iso2       | ISO 3166-1 alpha-2 code                                                                                                                        |
+| name       | Name for use in charts and reports                                                                                                             |
+| label      | Name for use in map labels                                                                                                                     |
+| color      | Thematic grouping of admin areas with separate IDs                                                                                             |
+| region_cd  | Region code of admin area (AME, EUR, AFR, etc)                                                                                                 |
+| region_nm  | Region name of admin area (Americas, Europe, Africa, etc)                                                                                      |
+| status_cd  | Status code of admin area (1, 5, 7, etc)                                                                                                       |
+| status_nm  | Status name of admin area (State, Territory, Autonomous Region, etc)                                                                           |
