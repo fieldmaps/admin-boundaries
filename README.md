@@ -21,7 +21,7 @@ These groups of sources are combined together into the following thematic output
 - Humanitarian (aka operational): Utilizes COD layers when available, falling back on geoBoundaries to fill in gaps. Commonly licensed under Creative Commons Attribution for Intergovernmental Organizations, although some layers may be more restrictive.
 - Open (aka academic): Uses geoBoundaries exclusively as a source group. Commonly licensed under Open Data Commons Open Database License, as many sources are derived from OpenStreetMap, but a variety of other permissive licenses are included as well.
 
-In the future, [Second Administrative Level Boundaries (SALB)](https://www.unsalb.org) will be added as a third source for the Authoritative (aka government) thematic output.
+In the future, [Second Administrative Level Boundaries (SALB)](https://www.unsalb.org) will be added as a third source for the Authoritative (aka member state provided) thematic output.
 
 ## Methodology
 
@@ -61,40 +61,39 @@ The current repository takes extended boundaries from the polygon to voronoi too
 
 Each layer from ADM1 to ADM4 contains the following list of attributes.
 
-| Field Name | Field Description                                            |
-| ---------- | ------------------------------------------------------------ |
+| Field Name | Field Description                                                |
+| ---------- | ---------------------------------------------------------------- |
 | admX_id    | Unique ID for admin area, uses last updated value for versioning |
-| admX_src   | Original ID from source                                      |
-| admX_name  | Default romanized name (en, fr, es, pt), is never blank      |
-| admX_name1 | 1st additional name field in alternate language              |
-| admX_name1 | 2nd additional name field in alternate language              |
-| iso3       | ISO 3166-1 alpha-3 code                                      |
-| iso2       | ISO 3166-1 alpha-2 code                                      |
-| lvl_full   | Number of full coverage admin levels in source               |
-| lvl_part   | Number of partial coverage admin levels in source            |
-| lang       | Language of the default name field                           |
-| lang1      | Language of the 1st additional name field                    |
-| lang2      | Language of the 2nd additional name field                    |
-| src_date   | Date of dataset publication from primary source              |
-| src_update | Date of dataset publication through curation service         |
-| src_name   | Primary source name                                          |
+| admX_src   | Original ID from source                                          |
+| admX_name  | Default romanized name (en, fr, es, pt), is never blank          |
+| admX_name1 | 1st additional name field in alternate language                  |
+| admX_name1 | 2nd additional name field in alternate language                  |
+| iso3       | ISO 3166-1 alpha-3 code                                          |
+| iso2       | ISO 3166-1 alpha-2 code                                          |
+| lvl_full   | Number of full coverage admin levels in source                   |
+| lvl_part   | Number of partial coverage admin levels in source                |
+| lang       | Language of the default name field                               |
+| lang1      | Language of the 1st additional name field                        |
+| lang2      | Language of the 2nd additional name field                        |
+| src_date   | Date of dataset publication from primary source                  |
+| src_update | Date of dataset publication through curation service             |
+| src_name   | Primary source name                                              |
 | src_org    | Secondary source name, sub-group in charge of collecting updates |
-| src_lic    | License of dataset and attribution required                  |
-| src_url    | URL link of original dataset                                 |
-| src_grp    | Source group dataset was taken from (COD, geoBoundaries, etc) |
+| src_lic    | License of dataset and attribution required                      |
+| src_url    | URL link of original dataset                                     |
+| src_grp    | Source group dataset was taken from (COD, geoBoundaries, etc)    |
 
 The ADM0 layer has its own attribute fields distinct from the different source layers.
 
-| Field Name | Field Description                                            |
-| ---------- | ------------------------------------------------------------ |
+| Field Name | Field Description                                                                                                                               |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | id         | Unique ID for admin area based on ISO alpha-3 code, some ADM0's are broken up to provide additional labels for islands and other distinct areas |
-| iso3       | ISO 3166-1 alpha-3 code                                      |
-| iso2       | ISO 3166-1 alpha-2 code                                      |
-| name       | Name for use in charts and reports                           |
-| label      | Name for use in map labels                                   |
-| color      | Thematic grouping of admin areas with separate IDs           |
-| region_cd  | Region code of admin area (AME, EUR, AFR, etc)               |
-| region_nm  | Region name of admin area (Americas, Europe, Africa, etc)    |
-| status_cd  | Status code of admin area (1, 5, 7, etc)                     |
-| status_nm  | Status name of admin area (State, Territory, Autonomous Region, etc) |
-
+| iso3       | ISO 3166-1 alpha-3 code                                                                                                                         |
+| iso2       | ISO 3166-1 alpha-2 code                                                                                                                         |
+| name       | Name for use in charts and reports                                                                                                              |
+| label      | Name for use in map labels                                                                                                                      |
+| color      | Thematic grouping of admin areas with separate IDs                                                                                              |
+| region_cd  | Region code of admin area (AME, EUR, AFR, etc)                                                                                                  |
+| region_nm  | Region name of admin area (Americas, Europe, Africa, etc)                                                                                       |
+| status_cd  | Status code of admin area (1, 5, 7, etc)                                                                                                        |
+| status_nm  | Status name of admin area (State, Territory, Autonomous Region, etc)                                                                            |
