@@ -2,6 +2,7 @@ import logging
 import requests
 from configparser import ConfigParser
 from pathlib import Path
+from psycopg2 import connect
 
 
 logging.basicConfig(level=logging.INFO,
@@ -12,9 +13,14 @@ DATABASE = 'edge_matcher'
 DATA_URL = 'https://data.fieldmaps.io'
 
 
-def apply_funcs(src, name, level, *args):
+def apply_funcs(src, name, level, ids, *args):
+    con = connect(database=DATABASE)
+    con.set_session(autocommit=True)
+    cur = con.cursor()
     for func in args:
-        func(src, name, level)
+        func(cur, src, name, level, ids)
+    cur.close()
+    con.close()
 
 
 def get_ids(level):

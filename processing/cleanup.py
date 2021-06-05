@@ -1,6 +1,5 @@
-from psycopg2 import connect
 from psycopg2.sql import SQL, Identifier
-from .utils import DATABASE, logging, geoms
+from .utils import logging, geoms
 
 logger = logging.getLogger(__name__)
 
@@ -9,9 +8,7 @@ drop_tmp = """
 """
 
 
-def main(src, name, level):
-    con = connect(database=DATABASE)
-    cur = con.cursor()
+def apply_queries(cur, src, name, level):
     cur.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'{src}_{name}_adm{level}_voronoi'),
     ))
@@ -20,7 +17,12 @@ def main(src, name, level):
             cur.execute(SQL(drop_tmp).format(
                 table_tmp1=Identifier(f'{src}_{name}_adm{l}_{geom}'),
             ))
-    con.commit()
-    cur.close()
-    con.close()
+
+
+def main(cur, src, name, level, ids):
+    if ids is not None:
+        for num in range(1, ids+1):
+            apply_queries(cur, src, f'{name}_{num}', level)
+    else:
+        apply_queries(cur, src, name, level)
     logger.info(f'{name}_{src}')
