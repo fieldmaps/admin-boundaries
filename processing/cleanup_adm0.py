@@ -13,13 +13,13 @@ drop_tmp = """
 
 def main():
     con = connect(database=DATABASE)
+    con.set_session(autocommit=True)
     cur = con.cursor()
     cur.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'adm0_points'),
         table_tmp2=Identifier(f'adm0_lines'),
         table_tmp3=Identifier(f'adm0_polygons'),
     ))
-    con.commit()
     cur.close()
     con.close()
     logger.info('adm0')

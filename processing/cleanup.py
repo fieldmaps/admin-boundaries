@@ -1,7 +1,5 @@
 from psycopg2.sql import SQL, Identifier
-from .utils import logging, geoms
-
-logger = logging.getLogger(__name__)
+from .utils import geoms
 
 drop_tmp = """
     DROP TABLE IF EXISTS {table_tmp1};
@@ -25,4 +23,3 @@ def main(cur, src, name, level, ids):
             apply_queries(cur, src, f'{name}_{num}', level)
     else:
         apply_queries(cur, src, name, level)
-    logger.info(f'{name}_{src}')
