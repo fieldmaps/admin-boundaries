@@ -4,7 +4,7 @@ from .utils import logging, dest_list
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
-data = (cwd / '../data').resolve()
+data = (cwd / '../../data').resolve()
 
 
 def cleanup(dest, geom):

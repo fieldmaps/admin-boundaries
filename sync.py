@@ -1,22 +1,24 @@
 from pathlib import Path
-import subprocess
+from subprocess import run
 
 cwd = Path(__file__).parent
 srcs = ['cod', 'geoboundaries']
-grps = ['extended', 'clipped']
+metas = [*srcs, 'edge-matched']
+grps = ['originals', 'normalized', 'standardized', 'extended', 'clipped']
 outputs = ['humanitarian', 'open']
 
 if __name__ == '__main__':
-    subprocess.run([
-        's3cmd', 'sync',
-        '--acl-public',
-        '--delete-removed',
-        '--rexclude', '\/\.',
-        (cwd / f'data/edge-matched.json').resolve(),
-        f's3://fieldmapsdata/edge-matched.json',
-    ])
+    for meta in metas:
+        run([
+            's3cmd', 'sync',
+            '--acl-public',
+            '--delete-removed',
+            '--rexclude', '\/\.',
+            (cwd / f'data/{meta}.json').resolve(),
+            f's3://fieldmapsdata/{meta}.json',
+        ])
     for output in outputs:
-        subprocess.run([
+        run([
             's3cmd', 'sync',
             '--acl-public',
             '--delete-removed',
@@ -24,17 +26,9 @@ if __name__ == '__main__':
             (cwd / f'data/edge-matched/{output}').resolve(),
             f's3://fieldmapsdata/edge-matched/',
         ])
-    subprocess.run([
-        's3cmd', 'sync',
-        '--acl-public',
-        '--delete-removed',
-        '--rexclude', '^\.',
-        f"{(cwd / f'data/adm0').resolve()}/",
-        f's3://fieldmapsdata/adm0/',
-    ])
     for grp in grps:
         for src in srcs:
-            subprocess.run([
+            run([
                 's3cmd', 'sync',
                 '--acl-public',
                 '--delete-removed',

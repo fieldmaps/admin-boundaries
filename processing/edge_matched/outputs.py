@@ -21,7 +21,7 @@ def export_layer(output, src, name, layer, level):
 
 
 def main(cur, src, name, level, ids):
-    outputs = (cwd / f'../data/{src}/clipped').resolve()
+    outputs = (cwd / f'../../data/{src}/clipped').resolve()
     outputs.mkdir(exist_ok=True, parents=True)
     output = (outputs / f'{name}.gpkg').resolve()
     output.unlink(missing_ok=True)

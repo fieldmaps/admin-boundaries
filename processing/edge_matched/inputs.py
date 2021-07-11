@@ -23,7 +23,7 @@ def import_layer(file, src, name, level):
 
 
 def main(cur, src, name, level, ids):
-    file = (cwd / f'../data/{src}/extended/{name}.gpkg').resolve()
+    file = (cwd / f'../../data/{src}/extended/{name}.gpkg').resolve()
     if ids is not None:
         for num in range(1, ids+1):
             import_layer(file, src, f'{name}_{num}', level)

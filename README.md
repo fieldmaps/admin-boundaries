@@ -1,4 +1,4 @@
-# Edge Matcher
+# Admin Boundaries
 
 This repository represents the final step of a multi-source data processing pipeline to create global edge-matched administrative boundary layers. Datasets are updated when new layers are published by each source, typically done on a weekly basis. Data can be accessed through the following table, as well as this URL which provides additional metadata such as date last updated: [data.fieldmaps.io/edge-matched.json](https://data.fieldmaps.io/edge-matched.json)
 
@@ -47,19 +47,19 @@ The outputs of intermediate steps 2-5 can be accessed through the following link
 - COD: [data.fieldmaps.io/cod.json](https://data.fieldmaps.io/cod.json)
 - geoBoundaries: [data.fieldmaps.io/geoboundaries.json](https://data.fieldmaps.io/geoboundaries.json)
 
-### Data Adapter (Step 1-3)
+### Current Repo (Step 1-3)
 
-The [Data Adapter](https://github.com/fieldmaps/data-adapter) repository is responsible for processing originals into normalized and standardized versions. Since each transformation at this stage involves only re-naming or files / layers / fields, and doesn't require geometry transformation or spatial relations, it is contained within this sub-pipeline.
+The current repository is responsible for processing originals into normalized and standardized versions. Since each transformation at this stage involves only re-naming or files / layers / fields, and doesn't require geometry transformation or spatial relations, it is contained within this sub-pipeline.
 
-### Polygon to Voronoi (Step 4)
+### Edge Extender (Step 4)
 
-The [Polygon to Voronoi](https://github.com/fieldmaps/polygon-voronoi) repository is a general purpose tool that has been broken out into its own self-contained unit. It does not modify attributes in any way, and the geometry transformations do not rely on any external data as overlays.
+The [Edge Extender](https://github.com/fieldmaps/edge-extender) repository is a general purpose tool that has been broken out into its own self-contained unit. It does not modify attributes in any way, and the geometry transformations do not rely on any external data as overlays.
 
 ### ADM0 Template (Step 5)
 
 The [ADM0 Template](https://github.com/fieldmaps/adm0-template) repository combines UNmap, used for political boundaries, with OpenStreetMap, used for coastline boundaries. The result is a very high resolution ADM0 boundary layer that is used for the clipping stage. Like the polygon to voronoi tool, this is also separated into its own unit as it can be used apart from this project.
 
-### Edge Matcher (Step 5-6)
+### Current Repo (Step 5-6)
 
 The current repository takes extended boundaries from the polygon to voronoi tool, and clips them with the output of the ADM0 Template repo into the datasets linked to at the top of this page.
 

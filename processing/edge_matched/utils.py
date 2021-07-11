@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
-DATABASE = 'edge_matcher'
+DATABASE = 'admin_boundaries'
 DATA_URL = 'https://data.fieldmaps.io'
 
 
@@ -46,7 +46,7 @@ def get_ids(level):
 def get_clip_ids(src):
     cwd = Path(__file__).parent
     cfg = ConfigParser()
-    cfg.read((cwd / '../config.ini'))
+    cfg.read((cwd / '../../config.ini'))
     config = cfg['default']
     ids = config[src].split(',')
     return list(filter(lambda x: x != '', ids))

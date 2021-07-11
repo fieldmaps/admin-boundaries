@@ -7,7 +7,7 @@ cwd = Path(__file__).parent
 
 
 def import_adm0(geom):
-    file = (cwd / f'../data/adm0/adm0_{geom}.gpkg').resolve()
+    file = (cwd / f'../../data/adm0/adm0_{geom}.gpkg').resolve()
     subprocess.run([
         'ogr2ogr',
         '-overwrite',

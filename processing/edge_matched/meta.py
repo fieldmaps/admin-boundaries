@@ -4,7 +4,7 @@ from pathlib import Path
 from .utils import DATA_URL, dests, geoms
 
 cwd = Path(__file__).parent
-outputs = (cwd / '../data')
+outputs = (cwd / '../../data')
 
 
 def main():
