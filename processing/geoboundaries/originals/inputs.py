@@ -5,18 +5,21 @@ from .utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
-inputs = (cwd / f'../../../data/geoboundaries/originals/boundaries')
+inputs = cwd / f'../../../inputs/geoboundaries'
 
 query_1 = """
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "shapeName" VARCHAR;
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "shapeISO" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "ADM1_NAME" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "PROV_34_NA" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "DIST_34_NA" VARCHAR;
 """
 query_2 = """
     DROP TABLE IF EXISTS {table_out};
     CREATE TABLE {table_out} AS
     SELECT
         fid,
-        "shapeName",
+        COALESCE("shapeName", "ADM1_NAME", "PROV_34_NA", "DIST_34_NA") AS "shapeName",
         "shapeISO",
         "shapeID",
         "shapeGroup",
@@ -33,7 +36,7 @@ drop_tmp = """
 
 
 def boundaries(cur, name, level):
-    file = (inputs / f'{name}_adm{level}.shp')
+    file = (inputs / f'{name}_adm{level}.gpkg')
     subprocess.run([
         'ogr2ogr',
         '-overwrite',
@@ -41,6 +44,7 @@ def boundaries(cur, name, level):
         '-dim', 'XY',
         '-t_srs', 'EPSG:4326',
         '-nlt', 'PROMOTE_TO_MULTI',
+        '-lco', 'OVERWRITE=YES',
         '-lco', 'FID=fid',
         '-lco', 'GEOMETRY_NAME=geom',
         '-lco', 'LAUNDER=NO',

@@ -8,32 +8,56 @@ cwd = Path(__file__).parent
 
 
 def export_gpkg(outputs, name):
-    file = (outputs / f'{name}.gpkg').resolve()
-    file_zip = (outputs / f'{name}.gpkg.zip').resolve()
-    file_zip.unlink(missing_ok=True)
-    with ZipFile(file_zip, 'w', ZIP_DEFLATED) as z:
-        z.write(file, file.name)
+    gpkg = outputs / f'{name}.gpkg'
+    gpkg_zip = outputs / f'{name}.gpkg.zip'
+    gpkg_zip.unlink(missing_ok=True)
+    with ZipFile(gpkg_zip, 'w', ZIP_DEFLATED) as z:
+        z.write(gpkg, gpkg.name)
+
+
+def export_shp(outputs, lvl, geom):
+    shp_zip = outputs / f'adm{lvl}_{geom}.shp.zip'
+    shp_zip.unlink(missing_ok=True)
+    with ZipFile(shp_zip, 'w', ZIP_DEFLATED) as z:
+        start = lvl if geom == 'polygons' else 0
+        for l in range(start, lvl+1):
+            name = f'adm{l}_{geom}'
+            for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
+                shp_part = outputs / f'{name}.{ext}'
+                z.write(shp_part, shp_part.name)
 
 
 def export_multi(outputs, name, ext):
-    file = (outputs / f'{name}.{ext}').resolve()
+    file = outputs / f'{name}.{ext}'
     file.unlink(missing_ok=True)
     subprocess.run([
         'ogr2ogr',
         '-overwrite',
         file,
-        (outputs / f'{name}.gpkg').resolve(),
+        outputs / f'{name}.gpkg',
     ])
-    file_zip = (outputs / f'{name}.{ext}.zip').resolve()
+    file_zip = outputs / f'{name}.{ext}.zip'
     file_zip.unlink(missing_ok=True)
     with ZipFile(file_zip, 'w', ZIP_DEFLATED) as z:
         z.write(file, file.name)
     file.unlink(missing_ok=True)
 
 
-def main(dest, geom):
-    outputs = (cwd / f'../../data/edge-matched/{dest}').resolve()
-    name = f'adm_{geom}'
+def cleanup(dest, wld, lvl, geom):
+    outputs = cwd / f'../../outputs/edge-matched/{dest}/{wld}'
+    for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
+        shp_part = outputs / f'adm{lvl}_{geom}.{ext}'
+        shp_part.unlink(missing_ok=True)
+
+
+def main(dest, wld, lvl, geom):
+    outputs = cwd / f'../../outputs/edge-matched/{dest}/{wld}'
+    name = f'adm{lvl}_{geom}'
     export_gpkg(outputs, name)
+    export_shp(outputs, lvl, geom)
     export_multi(outputs, name, 'xlsx')
-    logger.info(f'{dest}_{geom}')
+    gpkg = outputs / f'adm{lvl}_{geom}.gpkg'
+    gpkg.unlink(missing_ok=True)
+    if geom == 'polygons':
+        cleanup(dest, wld, lvl, geom)
+    logger.info(f'{dest}_{wld}_adm{lvl}_{geom}')

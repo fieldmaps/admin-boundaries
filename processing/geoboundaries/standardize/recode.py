@@ -39,7 +39,7 @@ def get_max_pad(df, level):
 
 
 def create_ids(df, name, level, date):
-    df['adm0_id'] = f"{name.upper()}{date.replace('-', '')}"
+    df['adm0_id'] = f"{name.upper()}-{date.strftime('%Y%m%d')}"
     for l in range(1, level+1):
         col = f'adm{l}_id'
         col_higher = f'adm{l-1}_id'
@@ -68,9 +68,15 @@ def order_ids(level):
 
 
 def add_meta(df, row):
-    meta = ['iso3', 'iso2', 'lvl_full', 'lvl_part', 'lang', 'lang1', 'lang2', 'src_date',
-            'src_update', 'src_name', 'src_org', 'src_lic', 'src_url']
-    for m in meta:
+    meta_1 = ['src_lvl']
+    for m in meta_1:
+        df[m] = row[m]
+    df['src_lang'] = 'en'
+    df['src_lang1'] = None
+    df['src_lang2'] = None
+    meta_2 = ['src_date', 'src_update', 'src_name',
+              'src_name1', 'src_lic', 'src_url']
+    for m in meta_2:
         df[m] = row[m]
     df['src_date'] = pd.to_datetime(df['src_date'])
     df['src_update'] = pd.to_datetime(df['src_update'])
@@ -89,10 +95,11 @@ def handle_filter(df, level, config):
                    if_exists='replace', index=False, method='multi')
 
 
-def main(cur, name, level, row):
+def main(_, name, level, row):
     query = f'SELECT {get_ids(level)} FROM {name}_adm{level}_00'
     df = pd.read_sql_query(query, con)
-    cols = list(map(lambda x: f'adm{x}_name', range(level+1)))
+    cols = list(map(lambda x: [f'adm{x}_name', f'adm{x}_id'], range(level+1)))
+    cols = [i for l in cols for i in l]
     df = df.sort_values(by=cols)
     df = rename_id(df, level)
     df = create_ids(df, name, level, row['src_update'])

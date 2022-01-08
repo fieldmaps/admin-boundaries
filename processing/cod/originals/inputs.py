@@ -22,7 +22,7 @@ drop_tmp = """
 
 
 def main(cur, name, level, _):
-    file = (cwd / f'../../../data/cod/originals/boundaries/{name}.gpkg')
+    file = (cwd / f'../../../inputs/cod/{name}.gpkg')
     ids = map(lambda x: f'admin{x}Pcode', range(level, -1, -1))
     subprocess.run([
         'ogr2ogr',

@@ -8,7 +8,8 @@ from .utils import logging, DATABASE
 logger = logging.getLogger(__name__)
 
 cwd = Path(__file__).parent
-outputs = (cwd / '../../../data/cod/normalized').resolve()
+data = cwd / '../../../data/cod/originals'
+outputs = cwd / '../../../outputs/cod/originals'
 
 query_1 = """
     DROP VIEW IF EXISTS {view_out};
@@ -22,8 +23,8 @@ query_1 = """
 """
 
 
-def export_multi(name, level, ext):
-    file = (outputs / f'{name}.{ext}').resolve()
+def export_data(name, level):
+    file = data / f'{name}.gpkg'
     file.unlink(missing_ok=True)
     for l in range(level+1):
         subprocess.run([
@@ -36,12 +37,29 @@ def export_multi(name, level, ext):
         ])
 
 
+def export_output(name, ext):
+    gpkg = data / f'{name}.gpkg'
+    tmp = outputs / f'{name}.{ext}'
+    subprocess.run([
+        'ogr2ogr',
+        '-overwrite',
+        tmp,
+        gpkg,
+    ])
+    file = outputs / f'{name}.{ext}.zip'
+    file.unlink(missing_ok=True)
+    with ZipFile(file, 'w', ZIP_DEFLATED) as z:
+        z.write(tmp, tmp.name)
+    tmp.unlink(missing_ok=True)
+
+
 def export_shp(name, level):
-    tmp = (outputs / f'{name}_shp').resolve()
+    tmp = outputs / f'{name}_tmp'
     shutil.rmtree(tmp, ignore_errors=True)
     tmp.mkdir(exist_ok=True, parents=True)
     for l in range(level+1):
-        file = (tmp / f'{name}_adm{l}.shp').resolve()
+        file = tmp / f'{name}_adm{l}.shp'
+        file_svg = tmp / f'{name}_adm{l}.svg'
         subprocess.run([
             'ogr2ogr',
             '-overwrite',
@@ -50,18 +68,33 @@ def export_shp(name, level):
             file,
             f'PG:dbname={DATABASE}', f'{name}_adm{l}_shp',
         ])
-    file_zip = (outputs / f'{name}.shp.zip').resolve()
+        subprocess.run([
+            'mapshaper',
+            file,
+            '-quiet',
+            '-style', 'fill="#fff"', 'stroke="#000"',
+            '-o', file_svg,
+        ])
+    file_zip = outputs / f'{name}.shp.zip'
+    file_zip_svg = outputs / f'{name}.svg.zip'
     file_zip.unlink(missing_ok=True)
+    file_zip_svg.unlink(missing_ok=True)
     with ZipFile(file_zip, 'w', ZIP_DEFLATED) as z:
         for l in range(level, -1, -1):
             for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
-                file = (tmp / f'{name}_adm{l}.{ext}').resolve()
+                file = tmp / f'{name}_adm{l}.{ext}'
                 z.write(file, file.name)
                 file.unlink(missing_ok=True)
+    with ZipFile(file_zip_svg, 'w', ZIP_DEFLATED) as z:
+        for l in range(level, -1, -1):
+            file_svg = tmp / f'{name}_adm{l}.svg'
+            z.write(file_svg, file_svg.name)
+            file_svg.unlink(missing_ok=True)
     shutil.rmtree(tmp, ignore_errors=True)
 
 
 def main(cur, name, level, _):
+    data.mkdir(exist_ok=True, parents=True)
     outputs.mkdir(exist_ok=True, parents=True)
     for l in range(level, -1, -1):
         cur.execute(SQL(query_1).format(
@@ -78,7 +111,8 @@ def main(cur, name, level, _):
             id2=Identifier(f'ADM{l}_PCODE'),
             view_out=Identifier(f'{name}_adm{l}_shp'),
         ))
-    export_multi(name, level, 'gpkg')
-    export_multi(name, level, 'xlsx')
+    export_data(name, level)
+    export_output(name, 'gpkg')
+    export_output(name, 'xlsx')
     export_shp(name, level)
     logger.info(name)

@@ -4,11 +4,11 @@ from .utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
-inputs = (cwd / f'../../../data/geoboundaries/normalized').resolve()
+inputs = cwd / f'../../../data/geoboundaries/originals'
 
 
-def main(cur, name, level, _):
-    file = (inputs / f'{name}.gpkg').resolve()
+def main(_, name, level, __):
+    file = inputs / f'{name}.gpkg'
     subprocess.run([
         'ogr2ogr',
         '-overwrite',

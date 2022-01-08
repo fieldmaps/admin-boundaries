@@ -1,31 +1,103 @@
 import logging
-import requests
-from configparser import ConfigParser
+import numpy as np
+import pandas as pd
 from pathlib import Path
 from psycopg2 import connect
-
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 DATABASE = 'admin_boundaries'
-DATA_URL = 'https://data.fieldmaps.io'
+
+# world_views = ['intl', 'all', 'usa', 'chn', 'ind']
+world_views = ['intl']
+geoms = ['lines', 'points', 'polygons']
+geoms_clip = ['clip', 'lines', 'points', 'polygons']
+srcs = ['geoboundaries', 'cod']
+dests = ['open', 'humanitarian']
 
 
-def apply_funcs(src, name, level, ids, *args):
+def apply_funcs(src, wld, row, *args):
     con = connect(database=DATABASE)
     con.set_session(autocommit=True)
     cur = con.cursor()
     for func in args:
-        func(cur, src, name, level, ids)
+        func(cur, src, wld, row)
     cur.close()
     con.close()
 
 
-def get_ids(level):
+def get_meta():
+    cwd = Path(__file__).parent
+    df = pd.read_excel(cwd / '../../inputs/meta.xlsx', engine='openpyxl',
+                       keep_default_na=False, na_values=['', '#N/A'])
+    return df
+
+
+def get_input_list(df0):
+    result = {}
+    for src in srcs:
+        df = df0.copy()
+        df = df.rename(columns={f'{src}_lvl': 'lvl'})
+        df['id'] = df['id'].str.lower()
+        df = df[['id', 'lvl']]
+        df['lvl'] = df['lvl'].astype('Int64')
+        df = df[df['lvl'] > 0]
+        result[src] = df.to_dict('records')
+    return result
+
+
+def get_src_list(df0):
+    result = {}
+    for src in srcs:
+        for wld in world_views:
+            df = df0.copy()
+            df = df[df[f'clip_{wld}'] != 0]
+            df['id_clip'] = df[f'clip_{wld}'].combine_first(df['id'])
+            df['id_attr'] = df[f'attr_{wld}'].combine_first(df['id_clip'])
+            df['id'] = df['id'].str.lower()
+            df = df.rename(columns={f'{src}_lvl': 'lvl'})
+            df = df[['id', 'id_clip', 'id_attr', 'lvl']]
+            df['lvl'] = df['lvl'].astype('Int64')
+            df = df[df['lvl'] > 0]
+            result[f'{src}_{wld}'] = df.to_dict('records')
+    return result
+
+
+def get_adm0_list(df0):
+    result = {}
+    for wld in world_views:
+        df = df0.copy()
+        df = df[df[f'clip_{wld}'] != 0]
+        df['id_clip'] = df[f'clip_{wld}'].combine_first(df['id'])
+        df['open_lvl'] = df['geoboundaries_lvl']
+        df['humanitarian_lvl'] = df['cod_lvl'].combine_first(df['open_lvl'])
+        result[f'open_{wld}'] = df[df['open_lvl'].isna()]['id_clip'].tolist()
+        result[f'humanitarian_{wld}'] = df[df['humanitarian_lvl'].isna(
+        )]['id_clip'].tolist()
+    return result
+
+
+def get_dest_list(src_list):
+    result = {}
+    for wld in world_views:
+        result[f'open_{wld}'] = {}
+        for row in src_list[f'geoboundaries_{wld}']:
+            row['src'] = 'geoboundaries'
+            result[f'open_{wld}'][row['id']] = row
+        result[f'humanitarian_{wld}'] = {**result[f'open_{wld}']}
+        for row in src_list[f'cod_{wld}']:
+            row['src'] = 'cod'
+            result[f'humanitarian_{wld}'][row['id']] = row
+        result[f'open_{wld}'] = result[f'open_{wld}'].values()
+        result[f'humanitarian_{wld}'] = result[f'humanitarian_{wld}'].values()
+    return result
+
+
+def get_src_ids(level, end=0, attr=True):
     ids = []
-    for l in range(level, -1, -1):
+    for l in range(level, end-1, -1):
         ids.extend([
             f'adm{l}_id',
             f'adm{l}_src',
@@ -33,52 +105,58 @@ def get_ids(level):
             f'adm{l}_name1',
             f'adm{l}_name2',
         ])
+    if attr is True:
+        ids.extend([
+            'src_lvl', 'src_lang', 'src_lang1', 'src_lang2',
+            'src_date', 'src_update',
+            'src_name', 'src_name1',
+            'src_lic', 'src_url', 'src_grp',
+        ])
+    return ids
+
+
+def get_wld_ids(adm0=True):
+    ids = []
+    if adm0 is True:
+        ids.extend([
+            'adm0_id', 'adm0_src',
+            'adm0_name', 'adm0_name1', 'adm0_name2',
+        ])
     ids.extend([
-        'iso3', 'iso2',
-        'lvl_full', 'lvl_part',
-        'lang', 'lang1', 'lang2',
-        'src_date', 'src_update',
-        'src_name', 'src_org', 'src_lic', 'src_url', 'src_grp',
+        'iso_cd', 'iso_2', 'iso_3', 'iso_3_grp',
+        'region3_cd', 'region3_nm',
+        'region2_cd', 'region2_nm',
+        'region1_cd', 'region1_nm',
+        'status_cd', 'status_nm',
+        'wld_date', 'wld_update',
+        'wld_view', 'wld_notes',
     ])
     return ids
 
 
-def get_clip_ids(src):
-    cwd = Path(__file__).parent
-    cfg = ConfigParser()
-    cfg.read((cwd / '../../config.ini'))
-    config = cfg['default']
-    ids = config[src].split(',')
-    return list(filter(lambda x: x != '', ids))
-
-
-geoms = ['lines', 'points', 'polygons']
-srcs = ['cod', 'geoboundaries']
-dests = ['humanitarian', 'open']
-
-src_list = {}
-for src in srcs:
-    meta = requests.get(f'{DATA_URL}/{src}.json').json()
-    src_list[src] = list(
-        filter(lambda x: x['lvl_full'] is not None and x['lvl_full'] >= 1,
-               meta)
-    )
-    clip_ids = get_clip_ids(src)
-    if len(clip_ids) > 0:
-        src_list[f'{src}_clip'] = list(
-            filter(lambda x: x['id'] in clip_ids, src_list[src]))
+def add_col_query(col):
+    query_1 = """
+        ALTER TABLE {table_out}
+        ADD COLUMN IF NOT EXISTS {name} INT8;
+    """
+    query_2 = """
+        ALTER TABLE {table_out}
+        ADD COLUMN IF NOT EXISTS {name} DATE;
+    """
+    query_3 = """
+        ALTER TABLE {table_out}
+        ADD COLUMN IF NOT EXISTS {name} VARCHAR;
+    """
+    if col.endswith('_lvl') or col.endswith('_cd'):
+        return query_1
+    elif col.endswith('date'):
+        return query_2
     else:
-        src_list[f'{src}_clip'] = src_list[src]
+        return query_3
 
-dest_list = {}
-dest_list['open'] = {}
-for row in src_list['geoboundaries']:
-    row['src'] = 'geoboundaries'
-    dest_list['open'][row['id']] = row
-dest_list['humanitarian'] = {**dest_list['open']}
-for row in src_list['cod']:
-    row['src'] = 'cod'
-    dest_list['humanitarian'][row['id']] = row
 
-dest_list['open'] = dest_list['open'].values()
-dest_list['humanitarian'] = dest_list['humanitarian'].values()
+meta = get_meta()
+input_list = get_input_list(meta)
+src_list = get_src_list(meta)
+adm0_list = get_adm0_list(meta)
+dest_list = get_dest_list(src_list)

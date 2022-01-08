@@ -1,20 +1,13 @@
-import json
 import logging
 from pathlib import Path
 import pandas as pd
-from configparser import ConfigParser
 from psycopg2 import connect
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
-def apply_funcs(name, level, row, *args):
-    con = connect(database=DATABASE)
-    con.set_session(autocommit=True)
-    cur = con.cursor()
-    for func in args:
-        func(cur, name, level, row)
-    cur.close()
-    con.close()
-
+DATABASE = 'admin_boundaries'
 
 langs = [
     'aa', 'ab', 'ae', 'af', 'ak', 'am', 'an', 'ar', 'as', 'av', 'ay', 'az',
@@ -36,6 +29,16 @@ langs = [
 ]
 
 
+def apply_funcs(name, level, row, *args):
+    con = connect(database=DATABASE)
+    con.set_session(autocommit=True)
+    cur = con.cursor()
+    for func in args:
+        func(cur, name, level, row)
+    cur.close()
+    con.close()
+
+
 def get_cols():
     result = {}
     for l in range(5, -1, -1):
@@ -51,40 +54,35 @@ def get_cols():
     return result
 
 
-def get_meta():
+def get_all_meta():
     cwd = Path(__file__).parent
-    config_path = (cwd / '../../../data/cod/originals/meta.xlsx').resolve()
-    dtypes = {'lvl_full': 'Int8', 'lvl_part': 'Int8',
-              'ids': 'Int8', 'operational': 'bool',
-              'api_cod': 'bool', 'api_fieldmaps': 'bool'}
-    df = pd.read_excel(config_path, engine='openpyxl', dtype=dtypes)
-    df['src_date'] = df['src_date'].astype(str).replace('NaT', None)
-    df['src_update'] = df['src_update'].astype(str).replace('NaT', None)
-    return json.loads(df.to_json(orient='records'))
+    config_path = cwd / '../../../inputs/meta.xlsx'
+    dtypes = {'cod_lvl': 'Int8'}
+    df = pd.read_excel(config_path, engine='openpyxl', dtype=dtypes,
+                       keep_default_na=False, na_values=['', '#N/A'])
+    df = df.rename(columns={'cod_lvl': 'src_lvl', 'cod_lang': 'src_lang',
+                   'cod_lang1': 'src_lang1', 'cod_lang2': 'src_lang2'})
+    df['id'] = df['id'].str[:3]
+    df['id'] = df['id'].str.lower()
+    df['iso_3'] = df['id'].str.upper()
+    df = df[['id', 'iso_3', 'src_lvl', 'src_lang', 'src_lang1', 'src_lang2']]
+    df = df[df['src_lvl'] > 0]
+    return df.drop_duplicates()
 
 
-def get_ids():
+def get_src_meta():
     cwd = Path(__file__).parent
-    cfg = ConfigParser()
-    cfg.read((cwd / '../../../config.ini'))
-    config = cfg['default']
-    ids = config['cod'].split(',')
-    return list(filter(lambda x: x != '', ids))
+    config_path = cwd / '../../../inputs/cod.xlsx'
+    df = pd.read_excel(config_path, engine='openpyxl',
+                       keep_default_na=False, na_values=['', '#N/A'])
+    return df
 
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
+def join_meta(df1, df2):
+    df = df1.merge(df2, on='iso_3')
+    return df.to_dict('records')
 
-DATABASE = 'admin_boundaries'
-DATA_URL = 'https://data.fieldmaps.io'
 
-ids = get_ids()
-meta = get_meta()
-adm0_list = list(
-    filter(lambda x: x['lvl_full'] is not None and x['lvl_full'] >= 1, meta)
-)
-if len(ids) > 0:
-    adm0_list = list(
-        filter(lambda x: x['id'] in ids, adm0_list)
-    )
+meta_local = get_all_meta()
+meta_src = get_src_meta()
+adm0_list = join_meta(meta_local, meta_src)

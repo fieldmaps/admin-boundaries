@@ -1,14 +1,15 @@
 import json
 import logging
-from configparser import ConfigParser
+import pandas as pd
 from pathlib import Path
 from psycopg2 import connect
-
-DATABASE = 'admin_boundaries'
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
+
+DATABASE = 'admin_boundaries'
+cwd = Path(__file__).parent
 
 
 def apply_funcs(name, level, row, *args):
@@ -21,32 +22,40 @@ def apply_funcs(name, level, row, *args):
     con.close()
 
 
-def get_ids():
-    cwd = Path(__file__).parent
-    cfg = ConfigParser()
-    cfg.read((cwd / '../../../config.ini'))
-    config = cfg['default']
-    ids = config['geoboundaries'].split(',')
-    return list(filter(lambda x: x != '', ids))
+def get_all_meta():
+    config_path = cwd / '../../../inputs/meta.xlsx'
+    dtypes = {'geoboundaries_lvl': 'Int8'}
+    df = pd.read_excel(config_path, engine='openpyxl', dtype=dtypes,
+                       keep_default_na=False, na_values=['', '#N/A'])
+    df = df.rename(columns={'geoboundaries_lvl': 'src_lvl'})
+    df['id'] = df['geoboundaries_id'].combine_first(df['id'])
+    df['id'] = df['id'].str[:3]
+    df['id'] = df['id'].str.lower()
+    df['iso_3'] = df['id'].str.upper()
+    df = df[['id', 'iso_3', 'src_lvl']]
+    df = df[df['src_lvl'] > 0]
+    return df.drop_duplicates()
 
 
-def get_meta():
-    cwd = Path(__file__).parent
-    with open(cwd / f'../../../data/geoboundaries.json') as f:
-        return json.load(f)
+def get_src_meta():
+    config_path = cwd / '../../../inputs/geoboundaries.xlsx'
+    df = pd.read_excel(config_path, engine='openpyxl',
+                       keep_default_na=False, na_values=['', '#N/A'])
+    return df
+
+
+def join_meta(df1, df2):
+    df = df1.merge(df2, on=['iso_3', 'src_lvl'])
+    df = df.where(df.notna(), None)
+    return df.to_dict('records')
 
 
 def get_filter_config():
-    cwd = Path(__file__).parent
-    with open(cwd / f'../../../config_geoboundaries.json') as f:
+    with open(cwd / f'../../../inputs/geoboundaries.json') as f:
         return json.load(f)
 
 
-ids = get_ids()
-meta = get_meta()
+meta_local = get_all_meta()
+meta_src = get_src_meta()
+adm0_list = join_meta(meta_local, meta_src)
 filter_config = get_filter_config()
-adm0_list = list(
-    filter(lambda x: x['lvl_full'] is not None and x['lvl_full'] >= 1, meta)
-)
-if len(ids) > 0:
-    adm0_list = list(filter(lambda x: x['id'] in ids, adm0_list))

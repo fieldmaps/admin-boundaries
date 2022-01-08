@@ -47,7 +47,10 @@ def get_max_pad(df, level):
 
 
 def create_ids(df, name, level, date):
-    df['adm0_id'] = f"{name.upper()}{date.replace('-', '')}"
+    if date is pd.NaT:
+        df['adm0_id'] = name.upper()
+    else:
+        df['adm0_id'] = f"{name.upper()}-{date.strftime('%Y%m%d')}"
     for l in range(1, level+1):
         col = f'adm{l}_id'
         col_higher = f'adm{l-1}_id'
@@ -76,8 +79,8 @@ def order_ids(level):
 
 
 def add_meta(df, row):
-    meta = ['iso3', 'iso2', 'lvl_full', 'lvl_part', 'lang', 'lang1', 'lang2', 'src_date',
-            'src_update', 'src_name', 'src_org', 'src_lic', 'src_url']
+    meta = ['src_lvl', 'src_lang', 'src_lang1', 'src_lang2', 'src_date',
+            'src_update', 'src_name', 'src_name1', 'src_lic', 'src_url']
     for m in meta:
         df[m] = row[m]
     df['src_date'] = pd.to_datetime(df['src_date'])
@@ -97,7 +100,7 @@ def handle_filter(df, level, config):
                    if_exists='replace', index=False, method='multi')
 
 
-def main(cur, name, level, langs, row):
+def main(_, name, level, langs, row):
     query = f'SELECT {get_ids(level, langs)} FROM {name}_adm{level}_00'
     df = pd.read_sql_query(query, con)
     cols = list(map(lambda x: f'admin{x}pcode', range(level+1)))

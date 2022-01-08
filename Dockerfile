@@ -11,7 +11,8 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B827C12C2D425E227E
   && echo "deb http://ppa.launchpad.net/ubuntugis/ubuntugis-unstable/ubuntu focal main" | tee /etc/apt/sources.list.d/ubuntugis.list \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
-  gdal-bin postgresql-12-postgis-3 python3-pip \
+  gdal-bin nodejs postgresql-12-postgis-3 python3-pip \
+  && npm install -g mapshaper \
   && rm -rf /var/lib/apt/lists/*
 
 RUN /etc/init.d/postgresql start \

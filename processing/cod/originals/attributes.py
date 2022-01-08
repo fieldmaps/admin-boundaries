@@ -6,9 +6,9 @@ logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
 
 
-def main(cur, name, level, row):
+def main(_, name, level, row):
     con = f'postgresql:///{DATABASE}'
-    file = (cwd / f'../../../data/cod/originals/attributes/{name}.xlsx')
+    file = (cwd / f'../../../inputs/cod/{name}.xlsx')
     sheets = pd.ExcelFile(file, engine='openpyxl')
     for l in range(level, -1, -1):
         sheet = list(filter(lambda x: x.endswith(str(l)),
