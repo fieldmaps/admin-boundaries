@@ -3,15 +3,17 @@ from pathlib import Path
 
 cwd = Path(__file__).parent
 srcs = ['edge-matched', 'cod', 'geoboundaries']
+exts = ['json', 'csv', 'xlsx']
 
 if __name__ == '__main__':
     for src in srcs:
-        subprocess.run([
-            's3cmd', 'sync',
-            '--acl-public',
-            cwd / f'outputs/{src}.json',
-            f's3://data.fieldmaps.io/{src}.json',
-        ])
+        for ext in exts:
+            subprocess.run([
+                's3cmd', 'sync',
+                '--acl-public',
+                cwd / f'outputs/{src}.{ext}',
+                f's3://data.fieldmaps.io/{src}.{ext}',
+            ])
         subprocess.run([
             's3cmd', 'sync',
             '--acl-public',

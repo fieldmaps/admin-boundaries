@@ -29,5 +29,7 @@ def main(name):
     with open((outputs / f'{name}.json'), 'w') as f:
         json.dump(data, f, separators=(',', ':'))
     df = pd.DataFrame(data)
+    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = df['date'].dt.date
     df.to_csv(outputs / f'{name}.csv', index=False)
     df.to_excel(outputs / f'{name}.xlsx', index=False)

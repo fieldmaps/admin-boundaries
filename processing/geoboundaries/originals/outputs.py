@@ -1,4 +1,5 @@
 import subprocess
+import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 from .utils import logging, DATABASE
@@ -31,17 +32,32 @@ def export_gpkg(name):
         z.write(gpkg, gpkg.name)
 
 
-def export_multi(name, ext):
+def export_shp(name, level):
+    tmp = outputs / f'{name}_tmp'
+    shutil.rmtree(tmp, ignore_errors=True)
+    tmp.mkdir(exist_ok=True, parents=True)
+    for l in range(level+1):
+        file = tmp / f'{name}_adm{l}.shp'
+        subprocess.run([
+            'pgsql2shp', '-k', '-q',
+            '-f', file,
+            DATABASE,
+            f'{name}_adm{l}_01',
+        ])
+    file_zip = outputs / f'{name}.shp.zip'
+    file_zip.unlink(missing_ok=True)
+    with ZipFile(file_zip, 'w', ZIP_DEFLATED) as z:
+        for l in range(level, -1, -1):
+            for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
+                file = tmp / f'{name}_adm{l}.{ext}'
+                z.write(file, file.name)
+    shutil.rmtree(tmp, ignore_errors=True)
+
+
+def export_xlsx(name):
     gpkg = data / f'{name}.gpkg'
-    file = outputs / f'{name}.{ext}'
-    file.unlink(missing_ok=True)
-    subprocess.run([
-        'ogr2ogr',
-        '-overwrite',
-        '-lco', 'ENCODING=UTF-8',
-        file,
-        gpkg,
-    ])
+    file = outputs / f'{name}.xlsx'
+    subprocess.run(['ogr2ogr', '-overwrite', file, gpkg])
 
 
 def main(_, name, level):
@@ -49,6 +65,6 @@ def main(_, name, level):
     outputs.mkdir(exist_ok=True, parents=True)
     export_data(name, level)
     export_gpkg(name)
-    export_multi(name, 'shp.zip')
-    export_multi(name, 'xlsx')
+    export_shp(name, level)
+    export_xlsx(name)
     logger.info(f'{name}_adm{level}')
