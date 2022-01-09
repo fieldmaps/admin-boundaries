@@ -14,6 +14,7 @@ if __name__ == '__main__':
                 cwd / f'outputs/{src}.{ext}',
                 f's3://data.fieldmaps.io/{src}.{ext}',
             ])
+    for src in srcs:
         subprocess.run([
             's3cmd', 'sync',
             '--acl-public',
