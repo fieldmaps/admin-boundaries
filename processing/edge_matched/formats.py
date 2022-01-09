@@ -36,6 +36,8 @@ def export_xlsx(outputs, name):
 
 def cleanup(dest, wld, lvl, geom):
     outputs = cwd / f'../../outputs/edge-matched/{dest}/{wld}'
+    gpkg = outputs / f'adm{lvl}_{geom}.gpkg'
+    gpkg.unlink(missing_ok=True)
     for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
         shp_part = outputs / f'adm{lvl}_{geom}.{ext}'
         shp_part.unlink(missing_ok=True)
