@@ -63,12 +63,12 @@ def dest_adm0(func):
         result.get()
 
 
-def dest_admx(func, start):
+def dest_admx(func, end):
     results = []
     pool = Pool()
     for dest in dests:
         for wld in world_views:
-            for lvl in range(start, 5):
+            for lvl in range(4, end-1, -1):
                 for geom in geoms:
                     args = [dest, wld, lvl, geom]
                     result = pool.apply_async(func, args=args)

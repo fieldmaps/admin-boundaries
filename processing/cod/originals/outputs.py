@@ -26,31 +26,28 @@ query_1 = """
 def export_data(name, level):
     file = data / f'{name}.gpkg'
     file.unlink(missing_ok=True)
-    for l in range(level+1):
+    for l in range(level, -1, -1):
         subprocess.run([
             'ogr2ogr',
             '-overwrite',
             '-nln', f'{name}_adm{l}',
-            '-mapFieldType', 'DateTime=Date',
             file,
             f'PG:dbname={DATABASE}', f'{name}_adm{l}',
         ])
 
 
-def export_output(name, ext):
+def export_gpkg(name):
     gpkg = data / f'{name}.gpkg'
-    tmp = outputs / f'{name}.{ext}'
-    subprocess.run([
-        'ogr2ogr',
-        '-overwrite',
-        tmp,
-        gpkg,
-    ])
-    file = outputs / f'{name}.{ext}.zip'
+    file = outputs / f'{name}.gpkg.zip'
     file.unlink(missing_ok=True)
     with ZipFile(file, 'w', ZIP_DEFLATED) as z:
-        z.write(tmp, tmp.name)
-    tmp.unlink(missing_ok=True)
+        z.write(gpkg, gpkg.name)
+
+
+def export_xlsx(name):
+    gpkg = data / f'{name}.gpkg'
+    file = outputs / f'{name}.xlsx'
+    subprocess.run(['ogr2ogr', '-overwrite', file, gpkg])
 
 
 def export_shp(name, level):
@@ -59,37 +56,19 @@ def export_shp(name, level):
     tmp.mkdir(exist_ok=True, parents=True)
     for l in range(level+1):
         file = tmp / f'{name}_adm{l}.shp'
-        file_svg = tmp / f'{name}_adm{l}.svg'
         subprocess.run([
-            'ogr2ogr',
-            '-overwrite',
-            '-lco', 'ENCODING=UTF-8',
-            '-mapFieldType', 'DateTime=Date',
-            file,
-            f'PG:dbname={DATABASE}', f'{name}_adm{l}_shp',
-        ])
-        subprocess.run([
-            'mapshaper',
-            file,
-            '-quiet',
-            '-style', 'fill="#fff"', 'stroke="#000"',
-            '-o', file_svg,
+            'pgsql2shp', '-k', '-q',
+            '-f', file,
+            DATABASE,
+            f'{name}_adm{l}_shp',
         ])
     file_zip = outputs / f'{name}.shp.zip'
-    file_zip_svg = outputs / f'{name}.svg.zip'
     file_zip.unlink(missing_ok=True)
-    file_zip_svg.unlink(missing_ok=True)
     with ZipFile(file_zip, 'w', ZIP_DEFLATED) as z:
         for l in range(level, -1, -1):
             for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
                 file = tmp / f'{name}_adm{l}.{ext}'
                 z.write(file, file.name)
-                file.unlink(missing_ok=True)
-    with ZipFile(file_zip_svg, 'w', ZIP_DEFLATED) as z:
-        for l in range(level, -1, -1):
-            file_svg = tmp / f'{name}_adm{l}.svg'
-            z.write(file_svg, file_svg.name)
-            file_svg.unlink(missing_ok=True)
     shutil.rmtree(tmp, ignore_errors=True)
 
 
@@ -112,7 +91,7 @@ def main(cur, name, level, _):
             view_out=Identifier(f'{name}_adm{l}_shp'),
         ))
     export_data(name, level)
-    export_output(name, 'gpkg')
-    export_output(name, 'xlsx')
+    export_gpkg(name)
     export_shp(name, level)
+    export_xlsx(name)
     logger.info(name)

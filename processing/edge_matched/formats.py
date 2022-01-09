@@ -27,20 +27,11 @@ def export_shp(outputs, lvl, geom):
                 z.write(shp_part, shp_part.name)
 
 
-def export_multi(outputs, name, ext):
-    file = outputs / f'{name}.{ext}'
+def export_xlsx(outputs, name):
+    gpkg = outputs / f'{name}.gpkg'
+    file = outputs / f'{name}.xlsx'
     file.unlink(missing_ok=True)
-    subprocess.run([
-        'ogr2ogr',
-        '-overwrite',
-        file,
-        outputs / f'{name}.gpkg',
-    ])
-    file_zip = outputs / f'{name}.{ext}.zip'
-    file_zip.unlink(missing_ok=True)
-    with ZipFile(file_zip, 'w', ZIP_DEFLATED) as z:
-        z.write(file, file.name)
-    file.unlink(missing_ok=True)
+    subprocess.run(['ogr2ogr', '-overwrite', file, gpkg])
 
 
 def cleanup(dest, wld, lvl, geom):
@@ -55,7 +46,7 @@ def main(dest, wld, lvl, geom):
     name = f'adm{lvl}_{geom}'
     export_gpkg(outputs, name)
     export_shp(outputs, lvl, geom)
-    export_multi(outputs, name, 'xlsx')
+    export_xlsx(outputs, name)
     gpkg = outputs / f'adm{lvl}_{geom}.gpkg'
     gpkg.unlink(missing_ok=True)
     if geom == 'polygons':

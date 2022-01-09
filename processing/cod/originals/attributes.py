@@ -16,7 +16,9 @@ def main(_, name, level, row):
         df = sheets.parse(sheet_name=sheet, keep_default_na=False,
                           na_values=['', '#N/A'], dtype=str)
         df['date'] = pd.to_datetime(row['src_date'])
+        df['date'] = df['date'].dt.date
         df['validOn'] = pd.to_datetime(row['src_update'])
+        df['validOn'] = df['validOn'].dt.date
         df['validTo'] = None
         cols = list(filter(lambda x: x in get_cols().keys(), df.columns))
         df = df[cols]

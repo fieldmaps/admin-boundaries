@@ -35,4 +35,5 @@ def main(src, name):
     outputs.mkdir(exist_ok=True, parents=True)
     export_gpkg(inputs, outputs, name)
     export_multi(inputs, outputs, name, 'shp.zip')
+    export_multi(inputs, outputs, name, 'xlsx')
     logger.info(name)
