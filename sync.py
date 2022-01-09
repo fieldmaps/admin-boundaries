@@ -2,7 +2,11 @@ import subprocess
 from pathlib import Path
 
 cwd = Path(__file__).parent
-srcs = ['edge-matched', 'cod', 'geoboundaries']
+srcs = {
+    'edge-matched': ['humanitarian', 'open'],
+    'cod': ['extended', 'originals'],
+    'geoboundaries': ['extended', 'originals'],
+}
 exts = ['json', 'csv', 'xlsx']
 
 if __name__ == '__main__':
@@ -15,12 +19,13 @@ if __name__ == '__main__':
                 f's3://data.fieldmaps.io/{src}.{ext}',
             ])
     for src in srcs:
-        subprocess.run([
-            's3cmd', 'sync',
-            '--acl-public',
-            '--delete-removed',
-            '--rexclude', '\/\.',
-            '--multipart-chunk-size-mb=5120',
-            cwd / f'outputs/{src}',
-            f's3://data.fieldmaps.io/',
-        ])
+        for grp in srcs[src]:
+            subprocess.run([
+                's3cmd', 'sync',
+                '--acl-public',
+                '--delete-removed',
+                '--rexclude', '\/\.',
+                '--multipart-chunk-size-mb=5120',
+                cwd / f'outputs/{src}/{grp}',
+                f's3://data.fieldmaps.io/{src}/',
+            ])
