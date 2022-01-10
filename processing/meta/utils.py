@@ -44,14 +44,6 @@ def join_meta(df1, df2, src):
     return df
 
 
-def get_input_list(df0, originals=False):
-    df = df0.copy()
-    if originals:
-        df['id'] = df['id'].str[:3]
-    df = df.drop_duplicates(subset='id', keep='first')
-    return df
-
-
 def get_land_date():
     cwd = Path(__file__).parent
     with open(cwd / '../../inputs/adm0/land/README.txt') as f:
@@ -63,8 +55,4 @@ meta_all = get_all_meta()
 meta = {}
 for src in srcs:
     meta_src = get_src_meta(src)
-    meta_join = join_meta(meta_all, meta_src, src)
-    meta[src] = {
-        'originals': get_input_list(meta_join, True),
-        'extended': get_input_list(meta_join),
-    }
+    meta[src] = join_meta(meta_all, meta_src, src)

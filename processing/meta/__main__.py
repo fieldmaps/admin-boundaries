@@ -8,3 +8,4 @@ if __name__ == '__main__':
     src.main('cod')
     src.main('geoboundaries')
     dest.main('edge-matched')
+    logger.info('meta')

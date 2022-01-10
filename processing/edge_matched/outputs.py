@@ -7,7 +7,7 @@ cwd = Path(__file__).parent
 
 
 def output_geom(gpkg, shp, dest, wld, lvl, geom):
-    for l in range(lvl+1):
+    for l in range(lvl, -1, -1):
         id = f'adm{l}_id' if geom == 'points' else f'adm{l-1}_id'
         id = 'fid_1' if geom == 'lines' and l == 0 else id
         subprocess.run([
