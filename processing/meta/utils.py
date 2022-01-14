@@ -20,16 +20,18 @@ cols = ['id', 'iso_3', 'adm0_name', 'adm0_name1', 'src_lvl',
 
 
 def get_all_meta():
-    df = pd.read_excel(cwd / '../../inputs/meta.xlsx', engine='openpyxl',
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../inputs/meta.csv',
+                     keep_default_na=False, na_values=['', '#N/A'])
     df['iso_3'] = df['id'].str[:3]
     df['id'] = df['id'].str.lower()
     return df
 
 
 def get_src_meta(src):
-    df = pd.read_excel(cwd / f'../../inputs/{src}.xlsx', engine='openpyxl',
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / f'../../inputs/{src}.csv',
+                     keep_default_na=False, na_values=['', '#N/A'])
+    df['src_date'] = pd.to_datetime(df['src_date'])
+    df['src_update'] = pd.to_datetime(df['src_update'])
     return df
 
 

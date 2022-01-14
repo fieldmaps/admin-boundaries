@@ -11,15 +11,26 @@ query_1 = """
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "shapeName" VARCHAR;
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "shapeISO" VARCHAR;
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "ADM1_NAME" VARCHAR;
-    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "PROV_34_NA" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "ADM2_NAME" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "ADM3_NAME" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "ADM4_NAME" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "admin1Name" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "admin2Name" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "admin3Name" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "admin4Name" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "DISTRICT" VARCHAR;
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "DIST_34_NA" VARCHAR;
+    ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "PROV_34_NA" VARCHAR;
 """
 query_2 = """
     DROP TABLE IF EXISTS {table_out};
     CREATE TABLE {table_out} AS
     SELECT
         fid,
-        COALESCE("shapeName", "ADM1_NAME", "PROV_34_NA", "DIST_34_NA") AS "shapeName",
+        COALESCE("shapeName",
+            "ADM1_NAME", "ADM2_NAME", "ADM3_NAME", "ADM4_NAME",
+            "admin1Name", "admin2Name", "admin3Name", "admin4Name",
+            "DISTRICT", "DIST_34_NA", "PROV_34_NA") AS "shapeName",
         "shapeISO",
         "shapeID",
         "shapeGroup",

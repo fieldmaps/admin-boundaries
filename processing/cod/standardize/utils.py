@@ -23,10 +23,9 @@ def apply_funcs(name, level, langs, row, *args):
 
 
 def get_all_meta():
-    config_path = cwd / '../../../inputs/meta.xlsx'
     dtypes = {'cod_lvl': 'Int8'}
-    df = pd.read_excel(config_path, engine='openpyxl', dtype=dtypes,
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../../inputs/meta.csv', dtype=dtypes,
+                     keep_default_na=False, na_values=['', '#N/A'])
     df = df.rename(columns={'cod_lvl': 'src_lvl', 'cod_lang': 'src_lang',
                    'cod_lang1': 'src_lang1', 'cod_lang2': 'src_lang2'})
     df['id'] = df['id'].str[:3]
@@ -38,9 +37,10 @@ def get_all_meta():
 
 
 def get_src_meta():
-    config_path = cwd / '../../../inputs/cod.xlsx'
-    df = pd.read_excel(config_path, engine='openpyxl',
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../../inputs/cod.csv',
+                     keep_default_na=False, na_values=['', '#N/A'])
+    df['src_date'] = pd.to_datetime(df['src_date'])
+    df['src_update'] = pd.to_datetime(df['src_update'])
     return df
 
 

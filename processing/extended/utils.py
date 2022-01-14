@@ -15,8 +15,8 @@ def apply_funcs(file, level, *args):
 
 def get_meta():
     cwd = Path(__file__).parent
-    df = pd.read_excel(cwd / '../../inputs/meta.xlsx', engine='openpyxl',
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../inputs/meta.csv',
+                     keep_default_na=False, na_values=['', '#N/A'])
     return df
 
 

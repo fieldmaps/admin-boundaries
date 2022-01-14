@@ -36,4 +36,4 @@ def main(src, name):
     export_gpkg(inputs, outputs, name)
     export_multi(inputs, outputs, name, 'shp.zip')
     export_multi(inputs, outputs, name, 'xlsx')
-    logger.info(name)
+    logger.info(f'{src}_{name}')

@@ -15,4 +15,4 @@ if __name__ == '__main__':
     df['src_date'] = pd.to_datetime(df['src_date'])
     df['src_update'] = pd.to_datetime(df['src_update'])
     df = df.sort_values(by=['src_update', 'src_date'], ascending=False)
-    df.to_excel(cwd / '../../../inputs/cod.xlsx', index=False)
+    df.to_csv(cwd / '../../../inputs/cod.csv', index=False)

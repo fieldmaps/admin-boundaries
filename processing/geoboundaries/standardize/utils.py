@@ -4,12 +4,11 @@ import pandas as pd
 from pathlib import Path
 from psycopg2 import connect
 
+DATABASE = 'admin_boundaries'
+cwd = Path(__file__).parent
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
-
-DATABASE = 'admin_boundaries'
-cwd = Path(__file__).parent
 
 
 def apply_funcs(name, level, row, *args):
@@ -23,10 +22,9 @@ def apply_funcs(name, level, row, *args):
 
 
 def get_all_meta():
-    config_path = cwd / '../../../inputs/meta.xlsx'
     dtypes = {'geoboundaries_lvl': 'Int8'}
-    df = pd.read_excel(config_path, engine='openpyxl', dtype=dtypes,
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../../inputs/meta.csv', dtype=dtypes,
+                     keep_default_na=False, na_values=['', '#N/A'])
     df = df.rename(columns={'geoboundaries_lvl': 'src_lvl'})
     df['id'] = df['geoboundaries_id'].combine_first(df['id'])
     df['id'] = df['id'].str[:3]
@@ -38,9 +36,10 @@ def get_all_meta():
 
 
 def get_src_meta():
-    config_path = cwd / '../../../inputs/geoboundaries.xlsx'
-    df = pd.read_excel(config_path, engine='openpyxl',
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../../inputs/geoboundaries.csv',
+                     keep_default_na=False, na_values=['', '#N/A'])
+    df['src_date'] = pd.to_datetime(df['src_date'])
+    df['src_update'] = pd.to_datetime(df['src_update'])
     return df
 
 
@@ -51,7 +50,7 @@ def join_meta(df1, df2):
 
 
 def get_filter_config():
-    with open(cwd / f'../../../inputs/geoboundaries.json') as f:
+    with open(cwd / '../../../inputs/geoboundaries.json') as f:
         return json.load(f)
 
 

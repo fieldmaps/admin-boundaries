@@ -9,9 +9,9 @@ query_1 = """
     SELECT
         {ids_src},
         {ids_wld},
-        (
-            ST_MaximumInscribedCircle(geom)
-        ).center::GEOMETRY(Point, 4326) AS geom
+        ST_ReducePrecision(
+            (ST_MaximumInscribedCircle(geom)).center
+        , 0.000000001)::GEOMETRY(Point, 4326) AS geom
     FROM {table_in};
 """
 

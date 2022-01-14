@@ -9,7 +9,7 @@ cwd = Path(__file__).parent
 def main(_, name, level, row):
     con = f'postgresql:///{DATABASE}'
     file = (cwd / f'../../../inputs/cod/{name}.xlsx')
-    sheets = pd.ExcelFile(file, engine='openpyxl')
+    sheets = pd.ExcelFile(file)
     for l in range(level, -1, -1):
         sheet = list(filter(lambda x: x.endswith(str(l)),
                             sheets.sheet_names))[0]

@@ -37,7 +37,7 @@ def get_meta():
     df['src_url'] = df['iso_3'].apply(
         lambda x: f'https://www.geoboundaries.org/api/current/gbOpen/{x}/ALL/')
     df = df.sort_values(by=['iso_3', 'src_lvl'])
-    df.to_excel(cwd / '../../../inputs/geoboundaries.xlsx', index=False)
+    df.to_csv(cwd / '../../../inputs/geoboundaries.csv', index=False)
     return df.to_dict('records')
 
 

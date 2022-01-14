@@ -22,10 +22,9 @@ def apply_funcs(file, level, *args):
 
 def get_meta():
     cwd = Path(__file__).parent
-    config_path = cwd / '../../../inputs/meta.xlsx'
     dtypes = {'geoboundaries_lvl': 'Int8'}
-    df = pd.read_excel(config_path, engine='openpyxl', dtype=dtypes,
-                       keep_default_na=False, na_values=['', '#N/A'])
+    df = pd.read_csv(cwd / '../../../inputs/meta.csv', dtype=dtypes,
+                     keep_default_na=False, na_values=['', '#N/A'])
     df = df.rename(columns={'geoboundaries_lvl': 'src_lvl'})
     df['id'] = df['geoboundaries_id'].combine_first(df['id'])
     df['id'] = df['id'].str[:3]
