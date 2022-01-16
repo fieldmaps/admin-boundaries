@@ -14,7 +14,7 @@ query_1 = """
 
 
 def adm0(wld, geom):
-    file = cwd / f'../../inputs/adm0/{wld}/adm0_{geom}.gpkg'
+    file = cwd / f'../../../adm0-generator/data/{wld}/adm0_{geom}.gpkg'
     subprocess.run([
         'ogr2ogr',
         '-overwrite',
