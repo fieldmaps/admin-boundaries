@@ -1,14 +1,19 @@
 import logging
-from pathlib import Path
 import pandas as pd
+from configparser import ConfigParser
+from pathlib import Path
 from psycopg2 import connect
 
-cwd = Path(__file__).parent
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 DATABASE = 'admin_boundaries'
+cwd = Path(__file__).parent
+cfg = ConfigParser()
+cfg.read(cwd / '../../../config.ini')
+id_filter = list(filter(None, map(lambda x: x.lower(),
+                                  cfg['default']['cod'].split(','))))
 
 langs = [
     'aa', 'ab', 'ae', 'af', 'ak', 'am', 'an', 'ar', 'as', 'av', 'ay', 'az',
@@ -83,3 +88,5 @@ def join_meta(df1, df2):
 meta_local = get_all_meta()
 meta_src = get_src_meta()
 adm0_list = join_meta(meta_local, meta_src)
+if len(id_filter) > 0:
+    adm0_list = filter(lambda x: x['id'] in id_filter, adm0_list)

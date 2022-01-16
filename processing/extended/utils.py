@@ -1,11 +1,20 @@
 import logging
 import pandas as pd
+from configparser import ConfigParser
 from pathlib import Path
 
-srcs = ['geoboundaries', 'cod']
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
+
+srcs = ['geoboundaries', 'cod']
+cwd = Path(__file__).parent
+cfg = ConfigParser()
+cfg.read(cwd / '../../config.ini')
+id_cod = list(filter(
+    None, map(lambda x: x.lower(), cfg['default']['cod'].split(','))))
+id_geoboundaries = list(filter(
+    None, map(lambda x: x.lower(), cfg['default']['geoboundaries'].split(','))))
 
 
 def apply_funcs(file, level, *args):
@@ -35,3 +44,9 @@ def get_input_list(df0):
 
 meta = get_meta()
 input_list = get_input_list(meta)
+if len(id_cod) > 0:
+    input_list['cod'] = filter(
+        lambda x: x['id'] in id_cod, input_list['cod'])
+if len(id_geoboundaries) > 0:
+    input_list['geoboundaries'] = filter(
+        lambda x: x['id'] in id_geoboundaries, input_list['geoboundaries'])
