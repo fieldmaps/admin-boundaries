@@ -1,9 +1,5 @@
 .git
-.vscode
-__pycache__
 *.pyc
-data
-inputs/cod
-inputs/geoboundaries
-inputs/adm0
-~$*.xlsx
+/data
+/inputs
+/outputs

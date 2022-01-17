@@ -25,5 +25,3 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY processing ./processing
 COPY config.ini ./config.ini
-
-CMD /etc/init.d/postgresql start && su postgres -c 'python3 -m processing'
