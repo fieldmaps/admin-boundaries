@@ -14,5 +14,5 @@ if __name__ == '__main__':
     df = pd.DataFrame(cod_meta)
     df['src_date'] = pd.to_datetime(df['src_date'])
     df['src_update'] = pd.to_datetime(df['src_update'])
-    df = df.sort_values(by=['src_update', 'src_date'], ascending=False)
+    df = df.sort_values(by='iso_3')
     df.to_csv(cwd / '../../../inputs/cod.csv', index=False)
