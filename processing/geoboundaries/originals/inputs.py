@@ -41,6 +41,12 @@ query_2 = """
     FROM {table_in};
     CREATE INDEX ON {table_out} USING GIST(geom);
 """
+query_3 = """
+    SELECT max(count) FROM (
+        SELECT count(*) FROM {table_in}
+        GROUP BY {id}
+    ) AS a
+"""
 drop_tmp = """
     DROP TABLE IF EXISTS {table_tmp1};
 """
@@ -74,6 +80,13 @@ def boundaries(cur, name, level):
     cur.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'{name}_adm{level}_tmp1'),
     ))
+    cur.execute(SQL(query_3).format(
+        table_in=Identifier(f'{name}_adm{level}_00'),
+        id=Identifier('shapeID'),
+    ))
+    has_duplicates = cur.fetchone()[0] > 1
+    if has_duplicates:
+        logger.info(f'DUPLICATE shapeID: {name}_adm{level}')
 
 
 def main(cur, name, level):

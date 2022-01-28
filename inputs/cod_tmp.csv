@@ -108,6 +108,7 @@ NER,Niger,Operational,https://data.humdata.org/dataset/niger-administrative-boun
 NGA,Nigeria,Operational,https://data.humdata.org/dataset/nga-administrative-boundaries
 NIC,Nicaragua,Preparedness,https://data.humdata.org/dataset/nicaragua-administrative-level-0
 NPL,Nepal,Preparedness,https://data.humdata.org/dataset/administrative-bounadries-of-nepal
+NRU,Nauru,Preparedness,
 OMN,Oman,Preparedness,https://data.humdata.org/dataset/oman-administrative-boundaries-populated-places
 PAK,Pakistan,Preparedness,https://data.humdata.org/dataset/pakistan-administrative-level-0-1-2-and-3-boundary-polygons-lines-and-central-places
 PAN,Panama,Preparedness,https://data.humdata.org/dataset/panama-administrative-level-0-1-2-and-3-boundaries
@@ -139,6 +140,7 @@ TCD,Chad,Operational,https://data.humdata.org/dataset/chad-admin-boundaries-admi
 TGO,Togo,Preparedness,https://data.humdata.org/dataset/togo-cod-ab
 THA,Thailand,Preparedness,https://data.humdata.org/dataset/thailand-administrative-boundaries
 TJK,Tajikistan,Preparedness,
+TKL,Tokelau,Preparedness,
 TLS,Timor-Leste,Preparedness,https://data.humdata.org/dataset/timor-leste-administrative-boundaries-levels-0-3
 TON,Tonga,Preparedness,https://data.humdata.org/dataset/tonga-administrative-level-0-1-2-3-boundary-polygons
 TTO,Trinidad and Tobago,Preparedness,https://data.humdata.org/dataset/trinidad-and-tobago-administrative-level-0-national-and-1-region-and-municipality-boundaries

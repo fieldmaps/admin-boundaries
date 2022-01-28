@@ -16,6 +16,12 @@ query_1 = """
         )::GEOMETRY(MultiPolygon, 4326) AS geom
     FROM {table_in};
 """
+query_2 = """
+    SELECT max(count) FROM (
+        SELECT count(*) FROM {table_in}
+        GROUP BY {id}
+    ) AS a
+"""
 drop_tmp = """
     DROP TABLE IF EXISTS {table_tmp1};
 """
@@ -47,4 +53,12 @@ def main(cur, name, level, _):
     cur.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'{name}_adm{level}_tmp1'),
     ))
+    cur.execute(SQL(query_2).format(
+        table_in=Identifier(f'{name}_adm{level}_00'),
+        id=Identifier(f'admin{level}Pcode'),
+    ))
+    has_duplicates = cur.fetchone()[0] > 1
+    if has_duplicates:
+        logger.info(f'DUPLICATE admin{level}Pcode: {name}')
+        raise RuntimeError(f'DUPLICATE admin{level}Pcode: {name}')
     logger.info(name)

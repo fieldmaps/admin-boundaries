@@ -15,6 +15,9 @@ def main(_, name, level, row):
                             sheets.sheet_names))[0]
         df = sheets.parse(sheet_name=sheet, keep_default_na=False,
                           na_values=['', '#N/A'], dtype=str)
+        if df[f'admin{l}Pcode'].duplicated().any():
+            logger.info(f'DUPLICATE admin{l}Pcode: {name}')
+            raise RuntimeError(f'DUPLICATE admin{l}Pcode: {name}')
         df['date'] = pd.to_datetime(row['src_date'])
         df['date'] = df['date'].dt.date
         df['validOn'] = pd.to_datetime(row['src_update'])
