@@ -2,6 +2,7 @@ services:
   admin-boundaries:
     build: .
     volumes:
+      - ./config.ini:/usr/src/app/config.ini
       - ./data:/usr/src/app/data
       - ./inputs:/usr/src/app/inputs
       - ./outputs:/usr/src/app/outputs
