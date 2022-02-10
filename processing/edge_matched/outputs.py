@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 from .utils import DATABASE, logging
@@ -53,10 +54,14 @@ def output_polygons(gpkg, shp, dest, lvl, wld):
 
 def main(dest, wld, lvl, geom):
     outputs = cwd / f'../../outputs/edge-matched/{dest}/{wld}'
+    data = cwd / f'../../data/edge-matched/{dest}/{wld}'
     outputs.mkdir(exist_ok=True, parents=True)
+    data.mkdir(exist_ok=True, parents=True)
     gpkg = outputs / f'adm{lvl}_{geom}.gpkg'
+    gpkg_data = data / f'adm{lvl}_{geom}.gpkg'
     shp = outputs / f'adm{lvl}_{geom}.shp'
     gpkg.unlink(missing_ok=True)
+    gpkg_data.unlink(missing_ok=True)
     for ext in ['cpg', 'dbf', 'prj', 'shp', 'shx']:
         shp_part = outputs / f'adm{lvl}_{geom}.{ext}'
         shp_part.unlink(missing_ok=True)
@@ -64,4 +69,6 @@ def main(dest, wld, lvl, geom):
         output_polygons(gpkg, shp, dest, lvl, wld)
     else:
         output_geom(gpkg, shp, dest, wld, lvl, geom)
+    if dest == 'humanitarian' and lvl == 4:
+        shutil.copyfile(gpkg, gpkg_data)
     logger.info(f'{dest}_{wld}_adm{lvl}_{geom}')

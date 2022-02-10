@@ -110,4 +110,3 @@ def main(_, name, level, row):
     else:
         df.to_sql(f'{name}_adm{level}_01', con,
                   if_exists='replace', index=False, method='multi')
-    logger.info(f'{name}_adm{level}')

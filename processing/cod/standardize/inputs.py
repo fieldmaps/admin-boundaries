@@ -22,4 +22,3 @@ def main(_, name, level, *__):
         cwd / f'../../../data/cod/originals/{name}.gpkg',
         f'{name}_adm{level}',
     ])
-    logger.info(f'{name}_adm{level}')

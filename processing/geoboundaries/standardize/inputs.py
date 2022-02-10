@@ -19,4 +19,3 @@ def main(_, name, level, __):
         '-f', 'PostgreSQL', f'PG:dbname={DATABASE}',
         file, f'{name}_adm{level}',
     ])
-    logger.info(f'{name}_adm{level}')

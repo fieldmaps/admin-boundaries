@@ -24,4 +24,3 @@ def main(cur, name, level, *_):
             table_tmp2=Identifier(f'{name}_adm{level}_01'),
             table_tmp3=Identifier(f'{name}_adm{level}_00'),
         ))
-    logger.info(f'{name}_adm{level}')
