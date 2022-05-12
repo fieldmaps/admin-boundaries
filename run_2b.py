@@ -1,6 +1,6 @@
 import subprocess
 
-funcs = ['extended', 'meta', 'edge_matched']
+funcs = ['meta', 'edge_matched']
 
 if __name__ == '__main__':
     for func in funcs:
