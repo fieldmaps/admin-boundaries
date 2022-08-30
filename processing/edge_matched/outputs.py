@@ -1,7 +1,7 @@
 import shutil
 import subprocess
 from pathlib import Path
-from .utils import DATABASE, logging
+from processing.edge_matched.utils import DATABASE, logging
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
@@ -10,7 +10,7 @@ cwd = Path(__file__).parent
 def output_geom(gpkg, shp, dest, wld, lvl, geom):
     for l in range(lvl, -1, -1):
         id = f'adm{l}_id' if geom == 'points' else f'adm{l-1}_id'
-        id = 'fid_1' if geom == 'lines' and l == 0 else id
+        id = 'adm_id' if geom == 'lines' and l == 0 else id
         subprocess.run([
             'ogr2ogr',
             '-append',
@@ -23,7 +23,7 @@ def output_geom(gpkg, shp, dest, wld, lvl, geom):
             f'PG:dbname={DATABASE}',
         ])
     id = f'adm{lvl}_id' if geom == 'points' else f'adm{lvl-1}_id'
-    id = 'fid_1' if geom == 'lines' and lvl == 0 else id
+    id = 'adm_id' if geom == 'lines' and lvl == 0 else id
     subprocess.run([
         'pgsql2shp', '-k', '-q',
         '-f', shp,

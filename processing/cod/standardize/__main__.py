@@ -1,8 +1,8 @@
 import shutil
 from multiprocessing import Pool
 from pathlib import Path
-from . import inputs, recode, outputs, cleanup
-from .utils import logging, adm0_list, apply_funcs
+from processing.cod.standardize import inputs, recode, outputs, cleanup
+from processing.cod.standardize.utils import logging, adm0_list, apply_funcs
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent

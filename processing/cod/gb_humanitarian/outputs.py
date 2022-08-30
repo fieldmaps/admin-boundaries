@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 from psycopg2.sql import SQL, Identifier, Literal
-from .utils import logging, meta, DATABASE
+from processing.cod.gb_humanitarian.utils import logging, meta, DATABASE
 
 logger = logging.getLogger(__name__)
 

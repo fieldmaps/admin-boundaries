@@ -1,5 +1,5 @@
 import pandas as pd
-from .utils import logging, DATABASE
+from processing.cod.gb_humanitarian.utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
 con = f'postgresql:///{DATABASE}'

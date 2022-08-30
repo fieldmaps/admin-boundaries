@@ -3,7 +3,7 @@ import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 from psycopg2.sql import SQL, Identifier
-from .utils import logging, DATABASE
+from processing.cod.originals.utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
 

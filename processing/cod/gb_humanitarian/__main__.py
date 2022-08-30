@@ -1,6 +1,6 @@
 from multiprocessing import Pool
-from . import inputs, outputs, cleanup
-from .utils import logging, adm0_list, apply_funcs
+from processing.cod.gb_humanitarian import inputs, outputs, cleanup
+from processing.cod.gb_humanitarian.utils import logging, adm0_list, apply_funcs
 
 logger = logging.getLogger(__name__)
 funcs = [inputs.main, outputs.main, cleanup.main]

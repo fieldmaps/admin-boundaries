@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from psycopg2.sql import SQL, Identifier
-from .utils import logging, filter_config, DATABASE
+from processing.cod.standardize.utils import logging, filter_config, DATABASE
 
 logger = logging.getLogger(__name__)
 

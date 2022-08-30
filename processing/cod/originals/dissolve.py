@@ -1,5 +1,5 @@
 from psycopg2.sql import SQL, Identifier
-from .utils import logging
+from processing.cod.originals.utils import logging
 
 logger = logging.getLogger(__name__)
 

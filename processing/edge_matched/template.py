@@ -1,7 +1,7 @@
 from psycopg2 import connect
 from psycopg2.sql import SQL, Identifier, Literal
-from .utils import (DATABASE, logging, geoms, adm0_list,
-                    get_src_ids, get_wld_ids, add_col_query)
+from processing.edge_matched.utils import (DATABASE, logging, geoms, adm0_list,
+                                           get_src_ids, get_wld_ids, add_col_query)
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ def main(dest, wld):
             ))
         cur.execute(SQL(query_1).format(
             table_in=Identifier(f'adm0_{geom}_{wld}'),
-            id=Identifier('fid_1' if geom == 'lines' else 'adm0_id'),
+            id=Identifier('fid' if geom == 'lines' else 'adm0_id'),
             view_out=Identifier(f'{dest}_adm0_{geom}_{wld}'),
         ))
     cur.execute(SQL(query_2).format(

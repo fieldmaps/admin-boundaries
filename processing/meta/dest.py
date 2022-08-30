@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 from pathlib import Path
-from .utils import DATA_URL, dests, world_views, geoms, land_date
+from .utils import DATA_URL, dests, world_views, land_date
 
 cwd = Path(__file__).parent
 outputs = cwd / '../../outputs'

@@ -1,5 +1,5 @@
 from psycopg2.sql import SQL, Identifier
-from .utils import logging, filter_config
+from processing.cod.standardize.utils import logging, filter_config
 
 logger = logging.getLogger(__name__)
 

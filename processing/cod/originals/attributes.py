@@ -1,6 +1,6 @@
 import pandas as pd
 from pathlib import Path
-from .utils import logging, get_cols, DATABASE
+from processing.cod.originals.utils import logging, get_cols, DATABASE
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
