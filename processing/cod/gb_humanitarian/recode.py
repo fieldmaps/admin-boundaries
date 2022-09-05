@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 con = f'postgresql:///{DATABASE}'
 
 
-def main(cur, name, level, langs, row):
+def main(_, name, level, langs, *__):
     query = f"""
         SELECT
             admin{level}name_{langs[0]} AS Name,

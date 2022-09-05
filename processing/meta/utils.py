@@ -36,7 +36,8 @@ def get_src_meta(src):
 
 
 def join_meta(df1, df2, src):
-    df1 = df1.rename(columns={f'{src}_lvl': 'src_lvl'})
+    df1 = df1.rename(columns={f'{src}_lvl': 'src_lvl', f'{src}_lang': 'src_lang',
+                     f'{src}_lang1': 'src_lang1', f'{src}_lang2': 'src_lang2'})
     df = df1.merge(df2, on=join[src])
     df = df[[x for x in cols if x in df.columns]]
     df['src_lvl'] = df['src_lvl'].astype('Int64')

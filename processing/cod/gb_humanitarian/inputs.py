@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
 
 
-def main(cur, name, level, *_):
+def main(_, name, level, *__):
     subprocess.run([
         'ogr2ogr',
         '-overwrite',
@@ -19,7 +19,7 @@ def main(cur, name, level, *_):
         '-lco', 'SPATIAL_INDEX=NONE',
         '-nln', f'{name}_adm{level}_00',
         '-f', 'PostgreSQL', f'PG:dbname={DATABASE}',
-        (cwd / f'../../../data/cod/normalized/{name}.gpkg'),
+        (cwd / f'../../../data/cod/originals/{name}.gpkg'),
         f'{name}_adm{level}',
     ])
     logger.info(f'{name}_adm{level}')

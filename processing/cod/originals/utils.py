@@ -4,16 +4,12 @@ from configparser import ConfigParser
 from pathlib import Path
 from psycopg import connect
 
+DATABASE = 'admin_boundaries'
+
+cwd = Path(__file__).parent
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
-
-DATABASE = 'admin_boundaries'
-cwd = Path(__file__).parent
-cfg = ConfigParser()
-cfg.read(cwd / '../../../config.ini')
-id_filter = list(filter(None, map(lambda x: x.lower(),
-                                  cfg['default']['cod'].split(','))))
 
 langs = [
     'aa', 'ab', 'ae', 'af', 'ak', 'am', 'an', 'ar', 'as', 'av', 'ay', 'az',
@@ -57,6 +53,15 @@ def get_cols():
     return result
 
 
+def get_ids():
+    cwd = Path(__file__).parent
+    cfg = ConfigParser()
+    cfg.read((cwd / '../../../config.ini'))
+    config = cfg['default']
+    ids = config['cod'].split(',')
+    return list(filter(lambda x: x != '', ids))
+
+
 def get_all_meta():
     dtypes = {'cod_lvl': 'Int8'}
     df = pd.read_csv(cwd / '../../../inputs/meta.csv', dtype=dtypes,
@@ -82,8 +87,9 @@ def join_meta(df1, df2):
     return df.to_dict('records')
 
 
+ids = get_ids()
 meta_local = get_all_meta()
 meta_src = get_src_meta()
 adm0_list = join_meta(meta_local, meta_src)
-if len(id_filter) > 0:
-    adm0_list = filter(lambda x: x['id'] in id_filter, adm0_list)
+if len(ids) > 0:
+    adm0_list = filter(lambda x: x['id'] in ids, adm0_list)

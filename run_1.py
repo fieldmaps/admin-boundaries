@@ -7,3 +7,4 @@ if __name__ == '__main__':
     for src in srcs:
         for func in funcs:
             subprocess.run(['python3', '-m', f'processing.{src}.{func}'])
+    subprocess.run(['python3', '-m', f'processing.cod.gb_humanitarian'])

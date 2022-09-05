@@ -3,12 +3,12 @@ import subprocess
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 from psycopg.sql import SQL, Identifier, Literal
-from processing.cod.gb_humanitarian.utils import logging, meta, DATABASE
+from processing.cod.gb_humanitarian.utils import logging, adm0_list, DATABASE
 
 logger = logging.getLogger(__name__)
 
 cwd = Path(__file__).parent
-outputs = cwd / '../../../data/cod/gb_humanitarian'
+outputs = cwd / '../../../outputs/gb-humanitarian/originals'
 
 query_1 = """
     DROP VIEW IF EXISTS {view_out};
@@ -23,9 +23,9 @@ query_1 = """
 
 
 def save_meta(name, level, output):
-    r = next(x for x in meta if x['id'] == name)
+    r = next(x for x in adm0_list if x['id'] == name)
     text = f"""Boundary Representative of Year: {r['src_date'][:4]}
-ISO-3166-1 (Alpha-3): {r['iso3']}
+ISO-3166-1 (Alpha-3): {r['iso_3']}
 Boundary Type: ADM{level}
 Canonical Boundary Type Name:
 Source 1: {r['src_name']}

@@ -6,6 +6,7 @@ srcs = {
     'edge-matched': ['humanitarian', 'open'],
     'cod': ['extended', 'originals'],
     'geoboundaries': ['extended', 'originals'],
+    'gb-humanitarian': ['originals'],
 }
 exts = ['json', 'csv', 'xlsx']
 

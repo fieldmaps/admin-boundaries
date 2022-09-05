@@ -1,11 +1,13 @@
-import json
 import logging
+import pandas as pd
 from configparser import ConfigParser
 from pathlib import Path
 from psycopg import connect
 
 DATABASE = 'admin_boundaries'
+DATA_URL = 'https://data.fieldmaps.io'
 
+cwd = Path(__file__).parent
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S')
@@ -27,23 +29,41 @@ def get_ids():
     return list(filter(lambda x: x != '', ids))
 
 
-def get_meta():
-    cwd = Path(__file__).parent
-    with open(cwd / f'../../../data/cod.json') as f:
-        return json.load(f)
+def get_all_meta():
+    dtypes = {'cod_lvl': 'Int8'}
+    df = pd.read_csv(cwd / '../../../inputs/meta.csv', dtype=dtypes,
+                     keep_default_na=False, na_values=['', '#N/A'])
+    df = df.rename(columns={'cod_lvl': 'src_lvl', 'cod_lang': 'src_lang',
+                   'cod_lang1': 'src_lang1', 'cod_lang2': 'src_lang2'})
+    df['id'] = df['id'].str[:3]
+    df['id'] = df['id'].str.lower()
+    df['iso_3'] = df['id'].str.upper()
+    df = df[['id', 'iso_3', 'src_lvl', 'src_lang', 'src_lang1', 'src_lang2']]
+    df = df[df['src_lvl'] > 0]
+    return df.drop_duplicates()
 
 
-def get_filter_config():
-    cwd = Path(__file__).parent
-    with open(cwd / f'../../../config_cod.json') as f:
-        return json.load(f)
+def get_src_meta():
+    df = pd.read_csv(cwd / '../../../inputs/cod.csv',
+                     keep_default_na=False, na_values=['', '#N/A'])
+    return df
 
 
+def join_meta(df1, df2):
+    df = df1.merge(df2, on='iso_3')
+    return df.to_dict('records')
+
+
+def get_land_date():
+    with open(cwd / '../../../../adm0-generator/data/land/README.txt') as f:
+        return f.readlines()[21][25:35]
+
+
+land_date = get_land_date()
 ids = get_ids()
-meta = get_meta()
-filter_config = get_filter_config()
-adm0_list = list(
-    filter(lambda x: x['lvl_full'] is not None and x['lvl_full'] >= 1, meta)
-)
+meta_local = get_all_meta()
+meta_src = get_src_meta()
+adm0_list_original = join_meta(meta_local, meta_src)
+adm0_list = join_meta(meta_local, meta_src)
 if len(ids) > 0:
-    adm0_list = list(filter(lambda x: x['id'] in ids, adm0_list))
+    adm0_list = filter(lambda x: x['id'] in ids, adm0_list)
