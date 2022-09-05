@@ -1,5 +1,5 @@
-from psycopg2.sql import SQL, Identifier
-from .utils import logging, get_src_ids, get_wld_ids
+from psycopg.sql import SQL, Identifier
+from processing.edge_matched.utils import logging, get_src_ids, get_wld_ids
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +28,11 @@ query_2 = """
 """
 
 
-def main(cur, src, wld, row):
+def main(conn, src, wld, row):
     name = row['id']
     lvl = row['lvl']
     for l in range(lvl, 0, -1):
-        cur.execute(SQL(query_1).format(
+        conn.execute(SQL(query_1).format(
             table_in1=Identifier(f'{src}_{name}_adm{l}_polygons_{wld}'),
             table_in2=Identifier(f'{src}_{name}_adm{l-1}_polygons_{wld}'),
             ids_src=SQL(',').join(
@@ -42,7 +42,7 @@ def main(cur, src, wld, row):
             id=Identifier(f'adm{l-1}_id'),
             table_out=Identifier(f'{src}_{name}_adm{l}_lines_{wld}'),
         ))
-    cur.execute(SQL(query_2).format(
+    conn.execute(SQL(query_2).format(
         table_in=Identifier(f'{src}_{name}_adm0_polygons_{wld}'),
         table_out=Identifier(f'{src}_{name}_adm0_lines_{wld}'),
     ))

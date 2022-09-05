@@ -1,8 +1,8 @@
 import subprocess
 from pathlib import Path
-from psycopg2 import connect
-from psycopg2.sql import SQL, Identifier
-from .utils import DATABASE, logging
+from psycopg import connect
+from psycopg.sql import SQL, Identifier
+from processing.edge_matched.utils import DATABASE, logging
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
@@ -27,14 +27,11 @@ def adm0(wld, geom):
         '-f', 'PostgreSQL', f'PG:dbname={DATABASE}',
         file,
     ])
-    con = connect(database=DATABASE)
-    con.set_session(autocommit=True)
-    cur = con.cursor()
-    cur.execute(SQL(query_1).format(
+    conn = connect(f'dbname={DATABASE}', autocommit=True)
+    conn.execute(SQL(query_1).format(
         table_out=Identifier(f'adm0_{geom}_{wld}'),
     ))
-    cur.close()
-    con.close()
+    conn.close()
     logger.info(f'{wld}_{geom}')
 
 

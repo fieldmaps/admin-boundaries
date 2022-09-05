@@ -2,7 +2,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
-from psycopg2.sql import SQL, Identifier, Literal
+from psycopg.sql import SQL, Identifier, Literal
 from processing.cod.gb_humanitarian.utils import logging, meta, DATABASE
 
 logger = logging.getLogger(__name__)
@@ -49,12 +49,12 @@ def compress_output(name, level, output):
         z.write(output / 'meta.txt', 'meta.txt')
 
 
-def main(cur, name, level, langs, *_):
+def main(conn, name, level, langs, *_):
     output = outputs / f'{name.upper()}_ADM{level}'
     shutil.rmtree(output, ignore_errors=True)
     output.mkdir(exist_ok=True, parents=True)
     file = output / f'{name.upper()}_ADM{level}.shp'
-    cur.execute(SQL(query_1).format(
+    conn.execute(SQL(query_1).format(
         table_in=Identifier(f'{name}_adm{level}_00'),
         name=Identifier(f'admin{level}name_{langs[0]}'),
         pcode=Identifier(f'admin{level}pcode'),

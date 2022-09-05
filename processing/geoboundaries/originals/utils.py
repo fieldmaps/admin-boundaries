@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 from configparser import ConfigParser
 from pathlib import Path
-from psycopg2 import connect
+from psycopg import connect
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
@@ -17,13 +17,10 @@ id_filter = list(filter(None, map(lambda x: x.lower(),
 
 
 def apply_funcs(file, level, *args):
-    con = connect(database=DATABASE)
-    con.set_session(autocommit=True)
-    cur = con.cursor()
+    conn = connect(f'dbname={DATABASE}', autocommit=True)
     for func in args:
-        func(cur, file, level)
-    cur.close()
-    con.close()
+        func(conn, file, level)
+    conn.close()
 
 
 def get_meta():

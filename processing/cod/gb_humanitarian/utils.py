@@ -2,7 +2,7 @@ import json
 import logging
 from configparser import ConfigParser
 from pathlib import Path
-from psycopg2 import connect
+from psycopg import connect
 
 DATABASE = 'admin_boundaries'
 
@@ -12,13 +12,10 @@ logging.basicConfig(level=logging.INFO,
 
 
 def apply_funcs(name, level, langs, row, *args):
-    con = connect(database=DATABASE)
-    con.set_session(autocommit=True)
-    cur = con.cursor()
+    conn = connect(f'dbname={DATABASE}', autocommit=True)
     for func in args:
-        func(cur, name, level, langs, row)
-    cur.close()
-    con.close()
+        func(conn, name, level, langs, row)
+    conn.close()
 
 
 def get_ids():

@@ -1,6 +1,6 @@
 import subprocess
 from pathlib import Path
-from psycopg2.sql import SQL, Identifier
+from psycopg.sql import SQL, Identifier
 from processing.cod.originals.utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ drop_tmp = """
 """
 
 
-def main(cur, name, level, _):
+def main(conn, name, level, _):
     file = (cwd / f'../../../inputs/cod/{name}.gpkg')
     ids = map(lambda x: f'admin{x}Pcode', range(level, -1, -1))
     subprocess.run([
@@ -45,19 +45,18 @@ def main(cur, name, level, _):
         '-f', 'PostgreSQL', f'PG:dbname={DATABASE}',
         file,
     ])
-    cur.execute(SQL(query_1).format(
+    conn.execute(SQL(query_1).format(
         table_in=Identifier(f'{name}_adm{level}_tmp1'),
         ids=SQL(',').join(map(Identifier, ids)),
         table_out=Identifier(f'{name}_adm{level}_00'),
     ))
-    cur.execute(SQL(drop_tmp).format(
+    conn.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'{name}_adm{level}_tmp1'),
     ))
-    cur.execute(SQL(query_2).format(
+    has_duplicates = conn.execute(SQL(query_2).format(
         table_in=Identifier(f'{name}_adm{level}_00'),
         id=Identifier(f'admin{level}Pcode'),
-    ))
-    has_duplicates = cur.fetchone()[0] > 1
+    )).fetchone()[0] > 1
     if has_duplicates:
         logger.info(f'DUPLICATE admin{level}Pcode: {name}')
         raise RuntimeError(f'DUPLICATE admin{level}Pcode: {name}')

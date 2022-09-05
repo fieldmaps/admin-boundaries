@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from pathlib import Path
-from psycopg2 import connect
+from psycopg import connect
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(message)s',
@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO,
 
 DATABASE = 'admin_boundaries'
 
-# world_views = ['intl', 'all', 'usa', 'chn', 'ind']
+# world_views = ['intl', 'all', 'usa']
 world_views = ['intl']
 geoms = ['lines', 'points', 'polygons']
 geoms_clip = ['clip', 'lines', 'points', 'polygons']
@@ -18,13 +18,10 @@ dests = ['open', 'humanitarian']
 
 
 def apply_funcs(src, wld, row, *args):
-    con = connect(database=DATABASE)
-    con.set_session(autocommit=True)
-    cur = con.cursor()
+    conn = connect(f'dbname={DATABASE}', autocommit=True)
     for func in args:
-        func(cur, src, wld, row)
-    cur.close()
-    con.close()
+        func(conn, src, wld, row)
+    conn.close()
 
 
 def get_meta():

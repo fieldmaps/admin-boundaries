@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
-from psycopg2.sql import SQL, Identifier
-from .utils import logging, DATABASE
+from psycopg.sql import SQL, Identifier
+from processing.geoboundaries.originals.utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
@@ -52,7 +52,7 @@ drop_tmp = """
 """
 
 
-def boundaries(cur, name, level):
+def boundaries(conn, name, level):
     file = (inputs / f'{name}_adm{level}.gpkg')
     subprocess.run([
         'ogr2ogr',
@@ -70,26 +70,25 @@ def boundaries(cur, name, level):
         '-f', 'PostgreSQL', f'PG:dbname={DATABASE}',
         file,
     ])
-    cur.execute(SQL(query_1).format(
+    conn.execute(SQL(query_1).format(
         table_in=Identifier(f'{name}_adm{level}_tmp1'),
     ))
-    cur.execute(SQL(query_2).format(
+    conn.execute(SQL(query_2).format(
         table_in=Identifier(f'{name}_adm{level}_tmp1'),
         table_out=Identifier(f'{name}_adm{level}_00'),
     ))
-    cur.execute(SQL(drop_tmp).format(
+    conn.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'{name}_adm{level}_tmp1'),
     ))
-    cur.execute(SQL(query_3).format(
+    has_duplicates = conn.execute(SQL(query_3).format(
         table_in=Identifier(f'{name}_adm{level}_00'),
         id=Identifier('shapeID'),
-    ))
-    has_duplicates = cur.fetchone()[0] > 1
+    )).fetchone()[0] > 1
     if has_duplicates:
         logger.info(f'DUPLICATE shapeID: {name}_adm{level}')
 
 
-def main(cur, name, level):
+def main(conn, name, level):
     for l in range(level, -1, -1):
-        boundaries(cur, name, l)
+        boundaries(conn, name, l)
     logger.info(f'{name}_adm{level}')

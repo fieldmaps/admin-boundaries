@@ -1,4 +1,4 @@
-from psycopg2.sql import SQL, Identifier
+from psycopg.sql import SQL, Identifier
 from processing.cod.gb_humanitarian.utils import logging
 
 logger = logging.getLogger(__name__)
@@ -9,8 +9,8 @@ drop_tmp = """
 """
 
 
-def main(cur, name, level, *_):
-    cur.execute(SQL(drop_tmp).format(
+def main(conn, name, level, *_):
+    conn.execute(SQL(drop_tmp).format(
         table_tmp1=Identifier(f'{name}_adm{level}_01'),
         table_tmp2=Identifier(f'{name}_adm{level}_00'),
     ))

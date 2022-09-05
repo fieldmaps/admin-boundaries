@@ -1,7 +1,7 @@
 import subprocess
-from psycopg2 import connect
-from psycopg2.sql import SQL, Identifier
-from .utils import DATABASE, logging, dest_list
+from psycopg import connect
+from psycopg.sql import SQL, Identifier
+from processing.edge_matched.utils import DATABASE, logging, dest_list
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +24,11 @@ def merge(dest, wld, lvl, geom):
                 f'PG:dbname={DATABASE}',
                 f'PG:dbname={DATABASE}', f'{src}_{name}_adm{lvl}_{geom}_{wld}',
             ])
-    con = connect(database=DATABASE)
-    con.set_session(autocommit=True)
-    cur = con.cursor()
-    cur.execute(SQL(query_1).format(
+    conn = connect(f'dbname={DATABASE}', autocommit=True)
+    conn.execute(SQL(query_1).format(
         table_out=Identifier(f'{dest}_adm{lvl}_{geom}_{wld}'),
     ))
-    cur.close()
-    con.close()
+    conn.close()
 
 
 def merge_polygons(dest, lvl, wld):

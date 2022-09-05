@@ -1,5 +1,5 @@
-from psycopg2.sql import SQL, Identifier
-from .utils import logging
+from psycopg.sql import SQL, Identifier
+from processing.geoboundaries.originals.utils import logging
 
 logger = logging.getLogger(__name__)
 
@@ -10,9 +10,9 @@ drop_tmp = """
 """
 
 
-def main(cur, layer, level):
+def main(conn, layer, level):
     for l in range(level, -1, -1):
-        cur.execute(SQL(drop_tmp).format(
+        conn.execute(SQL(drop_tmp).format(
             table_tmp1=Identifier(f'{layer}_adm{l}_00'),
             table_tmp2=Identifier(f'{layer}_adm{l}_01'),
             table_tmp3=Identifier(f'{layer}_adm{l}_02'),

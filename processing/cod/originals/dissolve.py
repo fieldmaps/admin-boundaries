@@ -1,4 +1,4 @@
-from psycopg2.sql import SQL, Identifier
+from psycopg.sql import SQL, Identifier
 from processing.cod.originals.utils import logging
 
 logger = logging.getLogger(__name__)
@@ -16,10 +16,10 @@ query_1 = """
 """
 
 
-def main(cur, name, level, _):
+def main(conn, name, level, _):
     for l in range(level-1, -1, -1):
         ids = map(lambda x: f'admin{x}Pcode', range(l, -1, -1))
-        cur.execute(SQL(query_1).format(
+        conn.execute(SQL(query_1).format(
             table_in=Identifier(f'{name}_adm{l+1}_00'),
             ids=SQL(',').join(map(Identifier, ids)),
             table_out=Identifier(f'{name}_adm{l}_00'),

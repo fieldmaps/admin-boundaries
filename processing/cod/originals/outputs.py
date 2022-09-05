@@ -2,7 +2,7 @@ import subprocess
 import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
-from psycopg2.sql import SQL, Identifier
+from psycopg.sql import SQL, Identifier
 from processing.cod.originals.utils import logging, DATABASE
 
 logger = logging.getLogger(__name__)
@@ -72,18 +72,18 @@ def export_shp(name, level):
     shutil.rmtree(tmp, ignore_errors=True)
 
 
-def main(cur, name, level, _):
+def main(conn, name, level, _):
     data.mkdir(exist_ok=True, parents=True)
     outputs.mkdir(exist_ok=True, parents=True)
     for l in range(level, -1, -1):
-        cur.execute(SQL(query_1).format(
+        conn.execute(SQL(query_1).format(
             table_in1=Identifier(f'{name}_adm{l}_00'),
             table_in2=Identifier(f'{name}_adm{l}_attr'),
             id1=Identifier(f'admin{l}Pcode'),
             id2=Identifier(f'admin{l}Pcode'),
             view_out=Identifier(f'{name}_adm{l}'),
         ))
-        cur.execute(SQL(query_1).format(
+        conn.execute(SQL(query_1).format(
             table_in1=Identifier(f'{name}_adm{l}_00'),
             table_in2=Identifier(f'{name}_adm{l}_attr_shp'),
             id1=Identifier(f'admin{l}Pcode'),
