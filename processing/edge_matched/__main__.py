@@ -1,8 +1,10 @@
 from multiprocessing import Pool
-from . import (attributes, cleanup, formats, inputs, lines,
-               merge, outputs, points, polygons, template)
-from .utils import (logging, apply_funcs, srcs, src_list,
-                    input_list, dests, geoms, geoms_clip, world_views)
+from processing.edge_matched import (
+    attributes, cleanup, formats, inputs, lines, merge, outputs, points,
+    polygons, template)
+from processing.edge_matched.utils import (
+    logging, apply_funcs, srcs, src_list, input_list, dests, geoms, geoms_clip,
+    world_views)
 
 logger = logging.getLogger(__name__)
 funcs = [attributes.main, polygons.main, lines.main, points.main]

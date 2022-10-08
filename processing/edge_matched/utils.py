@@ -9,7 +9,6 @@ logging.basicConfig(level=logging.INFO,
 
 DATABASE = 'admin_boundaries'
 
-# world_views = ['intl', 'all', 'usa']
 world_views = ['intl']
 geoms = ['lines', 'points', 'polygons']
 geoms_clip = ['clip', 'lines', 'points', 'polygons']

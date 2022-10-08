@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO,
 srcs = ['cod', 'geoboundaries']
 join = {'cod': ['iso_3'], 'geoboundaries': ['iso_3', 'src_lvl']}
 dests = ['humanitarian', 'open']
-# world_views = ['intl', 'all', 'usa', 'chn', 'ind']
 world_views = ['intl']
 geoms = ['polygons', 'lines', 'points']
 cols = ['id', 'iso_3', 'adm0_name', 'adm0_name1', 'src_lvl',
@@ -48,8 +47,8 @@ def join_meta(df1, df2, src):
 
 
 def get_land_date():
-    with open(cwd / '../../../adm0-generator/data/land/README.txt') as f:
-        return f.readlines()[21][25:35]
+    with open(cwd / '../../../adm0-generator/data/date.txt') as f:
+        return f.readline()
 
 
 land_date = get_land_date()
