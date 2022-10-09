@@ -13,10 +13,6 @@ def main(name):
     for dest in dests:
         for wld in world_views:
             for l in range(4, 0, -1):
-                if dest == 'open' and l >= 4:
-                    a_shp = None
-                else:
-                    a_shp = f'{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.shp.zip'
                 row = {
                     'id': f'{dest}_{wld}_adm{l}',
                     'grp': dest,
@@ -24,7 +20,7 @@ def main(name):
                     'adm': l,
                     'date': land_date,
                     'a_gpkg': f'{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.gpkg.zip',
-                    'a_shp': a_shp,
+                    'a_shp': f'{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.shp.zip',
                     'a_xlsx': f'{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.xlsx',
                     'l_gpkg': f'{DATA_URL}/{name}/{dest}/{wld}/adm{l}_lines.gpkg.zip',
                     'l_shp': f'{DATA_URL}/{name}/{dest}/{wld}/adm{l}_lines.shp.zip',

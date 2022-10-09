@@ -44,14 +44,13 @@ def cleanup(dest, wld, lvl, geom):
 
 
 def main(dest, wld, lvl, geom):
-    if not (dest == 'open' and lvl == 4):
-        outputs = cwd / f'../../outputs/edge-matched/{dest}/{wld}'
-        name = f'adm{lvl}_{geom}'
-        export_gpkg(outputs, name)
-        export_shp(outputs, lvl, geom)
-        export_xlsx(outputs, name)
-        gpkg = outputs / f'adm{lvl}_{geom}.gpkg'
-        gpkg.unlink(missing_ok=True)
-        if geom == 'polygons':
-            cleanup(dest, wld, lvl, geom)
-        logger.info(f'{dest}_{wld}_adm{lvl}_{geom}')
+    outputs = cwd / f'../../outputs/edge-matched/{dest}/{wld}'
+    name = f'adm{lvl}_{geom}'
+    export_gpkg(outputs, name)
+    export_shp(outputs, lvl, geom)
+    export_xlsx(outputs, name)
+    gpkg = outputs / f'adm{lvl}_{geom}.gpkg'
+    gpkg.unlink(missing_ok=True)
+    if geom == 'polygons':
+        cleanup(dest, wld, lvl, geom)
+    logger.info(f'{dest}_{wld}_adm{lvl}_{geom}')
