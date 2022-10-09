@@ -3,25 +3,12 @@ from processing.edge_matched import (
     attributes, cleanup, formats, inputs, lines, merge, outputs, points,
     polygons, template)
 from processing.edge_matched.utils import (
-    logging, apply_funcs, srcs, src_list, input_list, dests, geoms, geoms_clip,
-    world_views)
+    logging, apply_funcs, srcs, dest_list, input_list, dests, geoms,
+    geoms_clip, world_views)
 
 logger = logging.getLogger(__name__)
 funcs = [attributes.main, polygons.main, lines.main, points.main]
 funcs_cleanup = [cleanup.main]
-
-
-def src_adm0(func):
-    results = []
-    pool = Pool()
-    for wld in world_views:
-        for geom in geoms_clip:
-            result = pool.apply_async(func, args=[wld, geom])
-            results.append(result)
-    pool.close()
-    pool.join()
-    for result in results:
-        result.get()
 
 
 def src_admx(func):
@@ -37,13 +24,27 @@ def src_admx(func):
         result.get()
 
 
+def src_adm0(func):
+    results = []
+    pool = Pool()
+    for dest in dests:
+        for wld in world_views:
+            for geom in geoms_clip:
+                result = pool.apply_async(func, args=[dest, wld, geom])
+                results.append(result)
+    pool.close()
+    pool.join()
+    for result in results:
+        result.get()
+
+
 def process_boundaries(funcs):
     results = []
     pool = Pool()
-    for src in srcs:
+    for dest in dests:
         for wld in world_views:
-            for row in src_list[f'{src}_{wld}']:
-                args = [src, wld, row, *funcs]
+            for row in dest_list[f'{dest}_{wld}']:
+                args = [dest, wld, row, *funcs]
                 result = pool.apply_async(apply_funcs, args=args)
                 results.append(result)
     pool.close()

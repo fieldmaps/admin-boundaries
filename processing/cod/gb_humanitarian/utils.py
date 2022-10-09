@@ -55,7 +55,7 @@ def join_meta(df1, df2):
 
 
 def get_land_date():
-    with open(cwd / '../../../adm0-generator/data/date.txt') as f:
+    with open(cwd / '../../../../adm0-generator/data/date.txt') as f:
         return f.readline()
 
 

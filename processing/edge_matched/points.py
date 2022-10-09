@@ -16,14 +16,14 @@ query_1 = """
 """
 
 
-def main(conn, src, wld, row):
+def main(conn, dest, wld, row):
     name = row['id']
     lvl = row['lvl']
     for l in range(lvl, -1, -1):
         conn.execute(SQL(query_1).format(
-            table_in=Identifier(f'{src}_{name}_adm{l}_polygons_{wld}'),
+            table_in=Identifier(f'{dest}_{name}_adm{l}_polygons_{wld}'),
             ids_src=SQL(',').join(map(Identifier, get_src_ids(l))),
             ids_wld=SQL(',').join(map(Identifier, get_wld_ids(False))),
-            table_out=Identifier(f'{src}_{name}_adm{l}_points_{wld}'),
+            table_out=Identifier(f'{dest}_{name}_adm{l}_points_{wld}'),
         ))
-    logger.info(f'{src}_{wld}_{name}')
+    logger.info(f'{dest}_{wld}_{name}')

@@ -6,17 +6,12 @@ from processing.edge_matched.utils import (DATABASE, logging, geoms, adm0_list,
 logger = logging.getLogger(__name__)
 
 query_1 = """
-    DROP VIEW IF EXISTS {view_out};
-    CREATE VIEW {view_out} AS
-    SELECT * FROM {table_in};
-"""
-query_2 = """
     DROP TABLE IF EXISTS {table_out};
     CREATE TABLE {table_out} AS
     SELECT * FROM {table_in}
     WHERE adm0_src IN ({ids});
 """
-query_3 = """
+query_2 = """
     UPDATE {table_out}
     SET
         adm4_id = COALESCE(adm4_id, adm3_id, adm2_id, adm1_id, adm0_id),
@@ -24,7 +19,7 @@ query_3 = """
         adm2_id = COALESCE(adm2_id, adm1_id, adm0_id),
         adm1_id = COALESCE(adm1_id, adm0_id);
 """
-query_4 = """
+query_3 = """
     DROP TABLE IF EXISTS {table_out};
     CREATE TABLE {table_out} AS
     SELECT
@@ -45,13 +40,8 @@ def main(dest, wld):
             conn.execute(SQL(drop_tmp).format(
                 table_tmp1=Identifier(f'{dest}_adm{l}_{geom}_{wld}'),
             ))
-        conn.execute(SQL(query_1).format(
-            table_in=Identifier(f'adm0_{geom}_{wld}'),
-            id=Identifier('fid' if geom == 'lines' else 'adm0_id'),
-            view_out=Identifier(f'{dest}_adm0_{geom}_{wld}'),
-        ))
-    conn.execute(SQL(query_2).format(
-        table_in=Identifier(f'adm0_polygons_{wld}'),
+    conn.execute(SQL(query_1).format(
+        table_in=Identifier(f'{dest}_adm0_polygons_{wld}'),
         ids=SQL(',').join(
             map(lambda x: Literal(x.upper()), adm0_list[f'{dest}_{wld}'])),
         table_out=Identifier(f'{dest}_adm4_polygons_{wld}_tmp1'),
@@ -61,10 +51,10 @@ def main(dest, wld):
             name=Identifier(id),
             table_out=Identifier(f'{dest}_adm4_polygons_{wld}_tmp1'),
         ))
-    conn.execute(SQL(query_3).format(
+    conn.execute(SQL(query_2).format(
         table_out=Identifier(f'{dest}_adm4_polygons_{wld}_tmp1'),
     ))
-    conn.execute(SQL(query_4).format(
+    conn.execute(SQL(query_3).format(
         table_in1=Identifier(f'{dest}_adm4_polygons_{wld}_tmp1'),
         ids_src=SQL(',').join(
             map(lambda x: Identifier('a', x), get_src_ids(4))),
@@ -74,7 +64,7 @@ def main(dest, wld):
         table_out=Identifier(f'{dest}_adm4_polygons_{wld}'),
     ))
     for l in range(3, 0, -1):
-        conn.execute(SQL(query_4).format(
+        conn.execute(SQL(query_3).format(
             table_in1=Identifier(f'{dest}_adm{l+1}_polygons_{wld}'),
             ids_src=SQL(',').join(
                 map(lambda x: Identifier('a', x), get_src_ids(l))),

@@ -12,6 +12,13 @@ exts = ['json', 'csv', 'xlsx']
 
 if __name__ == '__main__':
     for src in srcs:
+        for ext in exts:
+            subprocess.run([
+                's3cmd', 'sync',
+                '--acl-public',
+                cwd / f'outputs/{src}.{ext}',
+                f's3://data.fieldmaps.io/{src}.{ext}',
+            ])
         for grp in srcs[src]:
             subprocess.run([
                 's3cmd', 'sync',
@@ -21,11 +28,4 @@ if __name__ == '__main__':
                 '--multipart-chunk-size-mb=5120',
                 cwd / f'outputs/{src}/{grp}',
                 f's3://data.fieldmaps.io/{src}/',
-            ])
-        for ext in exts:
-            subprocess.run([
-                's3cmd', 'sync',
-                '--acl-public',
-                cwd / f'outputs/{src}.{ext}',
-                f's3://data.fieldmaps.io/{src}.{ext}',
             ])

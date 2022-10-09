@@ -43,27 +43,27 @@ query_2 = """
 """
 
 
-def main(conn, src, wld, row):
+def main(conn, dest, wld, row):
     name = row['id']
     adm0 = row['id_clip']
     lvl = row['lvl']
     conn.execute(SQL(query_1).format(
-        table_in1=Identifier(f'{src}_{name}_adm{lvl}_voronoi_{wld}'),
-        table_in2=Identifier(f'adm0_clip_{wld}'),
+        table_in1=Identifier(f'{dest}_{name}_adm{lvl}_voronoi_{wld}'),
+        table_in2=Identifier(f'{dest}_adm0_clip_{wld}'),
         id=Literal(adm0),
         ids_src=SQL(',').join(
             map(lambda x: Identifier('a', x), get_src_ids(4))),
         ids_wld=SQL(',').join(
             map(lambda x: Identifier('a', x), get_wld_ids(False))),
-        table_out=Identifier(f'{src}_{name}_adm{lvl}_polygons_{wld}'),
+        table_out=Identifier(f'{dest}_{name}_adm{lvl}_polygons_{wld}'),
     ))
     for l in range(lvl-1, -1, -1):
         conn.execute(SQL(query_2).format(
-            table_in=Identifier(f'{src}_{name}_adm{l+1}_polygons_{wld}'),
+            table_in=Identifier(f'{dest}_{name}_adm{l+1}_polygons_{wld}'),
             ids_src=SQL(',').join(
                 map(lambda x: Identifier('a', x), get_src_ids(l))),
             ids_wld=SQL(',').join(
                 map(lambda x: Identifier('a', x), get_wld_ids(False))),
-            table_out=Identifier(f'{src}_{name}_adm{l}_polygons_{wld}'),
+            table_out=Identifier(f'{dest}_{name}_adm{l}_polygons_{wld}'),
         ))
-    logger.info(f'{src}_{wld}_{name}')
+    logger.info(f'{dest}_{wld}_{name}')

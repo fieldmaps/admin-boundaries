@@ -9,21 +9,21 @@ drop_tmp = """
 """
 
 
-def main(conn, src, wld, row):
+def main(conn, dest, wld, row):
     name = row['id']
     lvl = row['lvl']
     for l in range(lvl+1):
         for geom in [*geoms, 'voronoi']:
             conn.execute(SQL(drop_tmp).format(
-                table_tmp1=Identifier(f'{src}_{name}_adm{l}_{geom}_{wld}'),
+                table_tmp1=Identifier(f'{dest}_{name}_adm{l}_{geom}_{wld}'),
             ))
-    logger.info(f'{src}_{wld}_{name}')
+    logger.info(f'{dest}_{wld}_{name}')
 
 
-def adm0(wld, geom):
+def adm0(dest, wld, geom):
     conn = connect(f'dbname={DATABASE}', autocommit=True)
     conn.execute(SQL(drop_tmp).format(
-        table_tmp1=Identifier(f'adm0_{geom}_{wld}'),
+        table_tmp1=Identifier(f'{dest}_adm0_{geom}_{wld}'),
     ))
     conn.close()
     logger.info(f'{wld}_{geom}')

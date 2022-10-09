@@ -10,10 +10,10 @@ logging.basicConfig(level=logging.INFO,
 DATABASE = 'admin_boundaries'
 
 world_views = ['intl']
-geoms = ['lines', 'points', 'polygons']
-geoms_clip = ['clip', 'lines', 'points', 'polygons']
-srcs = ['geoboundaries', 'cod']
-dests = ['open', 'humanitarian']
+geoms = ['polygons', 'lines', 'points']
+geoms_clip = ['clip', 'polygons', 'lines', 'points']
+srcs = ['cod', 'geoboundaries']
+dests = ['humanitarian', 'open']
 
 
 def apply_funcs(src, wld, row, *args):
