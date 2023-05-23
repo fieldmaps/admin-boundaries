@@ -22,8 +22,8 @@ def rename_id(df, level):
 
 
 def get_max_pad(df, level):
-    col = f"adm{level}_id"
-    col_higher = f"adm{level-1}_id"
+    col = f"adm{level}_src"
+    col_higher = f"adm{level-1}_src"
     prev_id = None
     higher_id = None
     id_num = None
@@ -48,7 +48,7 @@ def create_ids(df, name, level, date):
         higher_id = None
         id_num = None
         id_max = get_max_pad(df, l)
-        for _, row in df.iterrows():
+        for i, row in df.iterrows():
             if row[col_higher] != higher_id:
                 id_num = 1
             elif row[col] != prev_id:
@@ -56,7 +56,7 @@ def create_ids(df, name, level, date):
             higher_id = row[col_higher]
             prev_id = row[col]
             new_val = f"{higher_id}-{str(id_num).zfill(id_max)}"
-            row[f"adm{l}_id"] = new_val
+            df.at[i, f"adm{l}_id"] = new_val
     return df
 
 
