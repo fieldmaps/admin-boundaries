@@ -1,8 +1,5 @@
 import subprocess
 
-funcs = ['extended']
-
-if __name__ == '__main__':
-    for func in funcs:
-        subprocess.run(['python3', '-m', f'processing.{func}'])
-    subprocess.run(['python3', 'sync.py'])
+if __name__ == "__main__":
+    subprocess.run(["python", "-m", "app.extended"])
+    subprocess.run(["python", "sync.py"])
