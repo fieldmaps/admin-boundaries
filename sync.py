@@ -31,7 +31,7 @@ if __name__ == "__main__":
                     "--acl-public",
                     "--delete-removed",
                     "--rexclude",
-                    "\/\.",
+                    r"\/\.",
                     "--multipart-chunk-size-mb=5120",
                     cwd / f"outputs/{src}/{grp}",
                     f"s3://data.fieldmaps.io/{src}/",
