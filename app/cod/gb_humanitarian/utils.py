@@ -1,9 +1,12 @@
 import logging
-from configparser import ConfigParser
+from os import getenv
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 from psycopg import connect
+
+load_dotenv()
 
 DATABASE = "app"
 DATA_URL = "https://data.fieldmaps.io"
@@ -24,11 +27,7 @@ def apply_funcs(name, level, langs, row, *args):
 
 
 def get_ids():
-    cwd = Path(__file__).parent
-    cfg = ConfigParser()
-    cfg.read((cwd / "../../../config.ini"))
-    config = cfg["default"]
-    ids = config["cod"].split(",")
+    ids = getenv("COD", "").split(",")
     return list(filter(lambda x: x != "", ids))
 
 

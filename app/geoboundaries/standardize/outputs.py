@@ -38,10 +38,8 @@ def create_export(conn, name, name2, level):
         [
             "ogr2ogr",
             "-append",
-            "-mapFieldType",
-            "DateTime=Date",
-            "-nln",
-            f"{name2}_adm{level}",
+            *["-mapFieldType", "DateTime=Date"],
+            *["-nln", f"{name2}_adm{level}"],
             file,
             f"PG:dbname={DATABASE}",
             f"{name2}_adm{level}_02",

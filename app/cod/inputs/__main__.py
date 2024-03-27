@@ -1,7 +1,7 @@
 from pathlib import Path
 
+import httpx
 import pandas as pd
-import requests
 
 from .utils import COD_URL, join_hdx_meta
 
@@ -12,7 +12,7 @@ if __name__ == "__main__":
     for row in cod_meta:
         id = row["src_url"][33:]
         url = f"https://data.humdata.org/api/3/action/package_show?id={id}"
-        hdx_meta = requests.get(url).json().get("result")
+        hdx_meta = httpx.get(url).json().get("result")
         if hdx_meta is not None:
             row = join_hdx_meta(row, hdx_meta)
     df = pd.DataFrame(cod_meta)

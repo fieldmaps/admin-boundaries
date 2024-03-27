@@ -18,11 +18,9 @@ fieldmap = {
     "boundaryType": "src_lvl",
     "boundaryYearRepresented": "src_date",
     "sourceDataUpdateDate": "src_update",
-    "boundarySource-1": "src_name",
-    "boundarySource-2": "src_name1",
+    "boundarySource": "src_name",
     "boundaryLicense": "src_lic",
-    "licenseDetail": "src_lic1",
-    "licenseSource": "src_lic2",
+    "licenseSource": "src_lic1",
     "gjDownloadURL": "src_url1",
 }
 
@@ -32,10 +30,10 @@ def get_meta():
     df = df.replace({"nan": None})
     df = df[fieldmap.keys()]
     df = df.rename(columns=fieldmap)
-    df["src_date"] = pd.to_numeric(df["src_date"], downcast="signed")
+    df["src_date"] = pd.to_numeric(df["src_date"], errors="coerce", downcast="signed")
     df["src_date"] = pd.to_datetime(df["src_date"], format="%Y").dt.date
-    df["src_lvl"] = df["src_lvl"].str.extract("(\d+)").astype(int)
-    df["src_update"] = pd.to_datetime(df["src_update"], format="%b %d, %Y").dt.date
+    df["src_lvl"] = df["src_lvl"].str.extract(r"(\d+)").astype(int)
+    df["src_update"] = pd.to_datetime(df["src_update"], format="mixed").dt.date
     df["src_url"] = df["iso_3"].apply(
         lambda x: f"https://www.geoboundaries.org/api/current/gbOpen/{x}/ALL/"
     )

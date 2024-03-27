@@ -20,8 +20,7 @@ def export_data(name, level):
             [
                 "ogr2ogr",
                 "-overwrite",
-                "-nln",
-                f"{name}_adm{l}",
+                *["-nln", f"{name}_adm{l}"],
                 file,
                 f"PG:dbname={DATABASE}",
                 f"{name}_adm{l}_01",
@@ -46,9 +45,7 @@ def export_shp(name, level):
         subprocess.run(
             [
                 "pgsql2shp",
-                "-k",
-                "-q",
-                "-f",
+                *["-k", "-q", "-f"],
                 file,
                 DATABASE,
                 f"{name}_adm{l}_01",

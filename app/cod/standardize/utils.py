@@ -1,6 +1,5 @@
 import json
 import logging
-from configparser import ConfigParser
 from pathlib import Path
 
 import pandas as pd
@@ -14,8 +13,6 @@ logging.basicConfig(
 
 DATABASE = "app"
 cwd = Path(__file__).parent
-cfg = ConfigParser()
-cfg.read(cwd / "../../../config.ini")
 
 
 def apply_funcs(name, level, langs, row, *args):
@@ -65,7 +62,7 @@ def join_meta(df1, df2):
 
 
 def get_filter_config():
-    with open(cwd / f"../../../inputs/cod.json") as f:
+    with open(cwd / "../../../inputs/cod.json") as f:
         return json.load(f)
 
 

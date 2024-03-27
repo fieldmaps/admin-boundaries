@@ -65,9 +65,7 @@ def export_shp(name, level):
         subprocess.run(
             [
                 "pgsql2shp",
-                "-k",
-                "-q",
-                "-f",
+                *["-k", "-q", "-f"],
                 file,
                 DATABASE,
                 f"{name}_adm{l}_shp",

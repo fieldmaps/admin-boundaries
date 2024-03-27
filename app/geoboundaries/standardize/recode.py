@@ -80,7 +80,7 @@ def add_meta(df, row):
     df["src_lang"] = "en"
     df["src_lang1"] = None
     df["src_lang2"] = None
-    meta_2 = ["src_date", "src_update", "src_name", "src_name1", "src_lic", "src_url"]
+    meta_2 = ["src_date", "src_update", "src_name", "src_lic", "src_url"]
     for m in meta_2:
         df[m] = row[m]
     df["src_date"] = pd.to_datetime(df["src_date"])
@@ -106,7 +106,7 @@ def handle_filter(df, level, config):
 
 
 def main(_, name, level, row):
-    query = f"SELECT {get_ids(level)} FROM {name}_adm{level}_00"
+    query = f"SELECT {get_ids(level)} FROM {name}_adm{level}_00;"
     df = pd.read_sql_query(query, con)
     cols = list(map(lambda x: [f"adm{x}_name", f"adm{x}_id"], range(level + 1)))
     cols = [i for l in cols for i in l]

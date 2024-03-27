@@ -1,9 +1,12 @@
 import logging
-from configparser import ConfigParser
+from os import getenv
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 from psycopg import connect
+
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,10 +16,8 @@ logging.basicConfig(
 
 DATABASE = "app"
 cwd = Path(__file__).parent
-cfg = ConfigParser()
-cfg.read(cwd / "../../../config.ini")
 id_filter = list(
-    filter(None, map(lambda x: x.lower(), cfg["default"]["geoboundaries"].split(",")))
+    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(",")))
 )
 
 
@@ -36,9 +37,9 @@ def get_meta():
         na_values=["", "#N/A"],
     )
     df = df.rename(columns={"geoboundaries_lvl": "src_lvl"})
-    df["id"] = df["geoboundaries_id"].combine_first(df["id"])
     df["id"] = df["id"].str[:3]
     df["id"] = df["id"].str.lower()
+    df = df[df["geoboundaries_grp"].isna()]
     df = df[["id", "src_lvl"]]
     df = df[df["src_lvl"] > 0]
     return df.drop_duplicates().to_dict("records")

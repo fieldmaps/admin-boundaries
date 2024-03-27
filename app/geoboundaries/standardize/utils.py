@@ -1,6 +1,5 @@
 import json
 import logging
-from configparser import ConfigParser
 from pathlib import Path
 
 import pandas as pd
@@ -14,8 +13,6 @@ logging.basicConfig(
 
 DATABASE = "app"
 cwd = Path(__file__).parent
-cfg = ConfigParser()
-cfg.read(cwd / "../../../config.ini")
 
 
 def apply_funcs(name, level, row, *args):
@@ -34,7 +31,6 @@ def get_all_meta():
         na_values=["", "#N/A"],
     )
     df = df.rename(columns={"geoboundaries_lvl": "src_lvl"})
-    df["id"] = df["geoboundaries_id"].combine_first(df["id"])
     df["id"] = df["id"].str[:3]
     df["id"] = df["id"].str.lower()
     df["iso_3"] = df["id"].str.upper()

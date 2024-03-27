@@ -1,8 +1,11 @@
 import logging
-from configparser import ConfigParser
+from os import getenv
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,11 +15,9 @@ logging.basicConfig(
 
 srcs = ["geoboundaries", "cod"]
 cwd = Path(__file__).parent
-cfg = ConfigParser()
-cfg.read(cwd / "../../config.ini")
-id_cod = list(filter(None, map(lambda x: x.lower(), cfg["default"]["cod"].split(","))))
+id_cod = list(filter(None, map(lambda x: x.lower(), getenv("COD", "").split(","))))
 id_geoboundaries = list(
-    filter(None, map(lambda x: x.lower(), cfg["default"]["geoboundaries"].split(",")))
+    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(",")))
 )
 
 

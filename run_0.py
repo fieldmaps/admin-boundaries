@@ -1,6 +1,6 @@
 import subprocess
 
-# srcs = ['cod', 'geoboundaries']
+# srcs = ["cod", "geoboundaries"]
 srcs = ["cod"]
 
 if __name__ == "__main__":

@@ -1,9 +1,12 @@
 import logging
-from configparser import ConfigParser
+from os import getenv
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 from psycopg import connect
+
+load_dotenv()
 
 DATABASE = "app"
 
@@ -43,13 +46,13 @@ def apply_funcs(name, level, row, *args):
 
 def get_cols():
     result = {}
-    for l in range(5, -1, -1):
-        result[f"admin{l}Pcode"] = f"ADM{l}_PCODE"
-        result[f"admin{l}RefName"] = f"ADM{l}_REF"
+    for lvl in range(5, -1, -1):
+        result[f"admin{lvl}Pcode"] = f"ADM{lvl}_PCODE"
+        result[f"admin{lvl}RefName"] = f"ADM{lvl}_REF"
         for lang in langs:
-            result[f"admin{l}Name_{lang}"] = f"ADM{l}_{lang.upper()}"
-            result[f"admin{l}AltName1_{lang}"] = f"ADM{l}ALT1{lang.upper()}"
-            result[f"admin{l}AltName2_{lang}"] = f"ADM{l}ALT2{lang.upper()}"
+            result[f"admin{lvl}Name_{lang}"] = f"ADM{lvl}_{lang.upper()}"
+            result[f"admin{lvl}AltName1_{lang}"] = f"ADM{lvl}ALT1{lang.upper()}"
+            result[f"admin{lvl}AltName2_{lang}"] = f"ADM{lvl}ALT2{lang.upper()}"
     result["date"] = "DATE"
     result["validOn"] = "VALIDON"
     result["validTo"] = "VALIDTO"
@@ -57,11 +60,7 @@ def get_cols():
 
 
 def get_ids():
-    cwd = Path(__file__).parent
-    cfg = ConfigParser()
-    cfg.read((cwd / "../../../config.ini"))
-    config = cfg["default"]
-    ids = config["cod"].split(",")
+    ids = getenv("COD", "").split(",")
     return list(filter(lambda x: x != "", ids))
 
 
