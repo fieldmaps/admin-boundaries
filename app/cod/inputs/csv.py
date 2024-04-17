@@ -57,6 +57,6 @@ def main():
     df["src_api_date"] = pd.to_datetime(df["src_api_date"])
     df["src_update"] = pd.to_datetime(df["src_update"])
     df["src_api_update"] = pd.to_datetime(df["src_api_update"])
-    df = df.sort_values(by="iso_3")
     df = df[columns]
+    df = df.drop_duplicates(subset=["iso_3"])
     df.to_csv(cwd / "../../../inputs/cod.csv", index=False, encoding="utf-8-sig")

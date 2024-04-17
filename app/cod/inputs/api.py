@@ -13,7 +13,6 @@ outputs.mkdir(exist_ok=True, parents=True)
 
 def run(iso_3: str, lvl: int, idx: int | None, filename: str, url: str):
     idx = idx + lvl if idx is not None else lvl
-    (outputs / f"{filename}.gpkg").unlink(missing_ok=True)
     return subprocess.run(
         [
             "ogr2ogr",
