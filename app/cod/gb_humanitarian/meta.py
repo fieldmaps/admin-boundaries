@@ -31,5 +31,5 @@ def main():
     df["wld_date"] = df["wld_date"].dt.date
     df["src_date"] = pd.to_datetime(df["src_date"])
     df["src_date"] = df["src_date"].dt.date
-    df.to_csv(outputs / f"{name}.csv", index=False)
+    df.to_csv(outputs / f"{name}.csv", index=False, encoding="utf-8-sig")
     df.to_excel(outputs / f"{name}.xlsx", index=False)

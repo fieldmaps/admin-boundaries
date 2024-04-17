@@ -7,7 +7,7 @@ from .utils import DATABASE, logging
 
 logger = logging.getLogger(__name__)
 cwd = Path(__file__).parent
-inputs = cwd / f"../../../inputs/geoboundaries"
+inputs = cwd / "../../../inputs"
 
 query_1 = """
     ALTER TABLE {table_in} ADD COLUMN IF NOT EXISTS "shapeName" VARCHAR;
@@ -55,33 +55,25 @@ drop_tmp = """
 
 
 def boundaries(conn, name, level):
-    file = inputs / f"{name}_adm{level}.gpkg"
+    file = inputs / f"geoboundaries/{name}_adm{level}.gpkg"
+    file_custom = inputs / f"geoboundaries_custom/{name}_adm{level}.gpkg"
+    if file_custom.is_file():
+        file = file_custom
     subprocess.run(
         [
             "ogr2ogr",
             "-overwrite",
             "-makevalid",
-            "-dim",
-            "XY",
-            "-t_srs",
-            "EPSG:4326",
-            "-nlt",
-            "PROMOTE_TO_MULTI",
-            "-lco",
-            "OVERWRITE=YES",
-            "-lco",
-            "FID=fid",
-            "-lco",
-            "GEOMETRY_NAME=geom",
-            "-lco",
-            "LAUNDER=NO",
-            "-lco",
-            "SPATIAL_INDEX=NONE",
-            "-nln",
-            f"{name}_adm{level}_tmp1",
-            "-f",
-            "PostgreSQL",
-            f"PG:dbname={DATABASE}",
+            *["-dim", "XY"],
+            *["-t_srs", "EPSG:4326"],
+            *["-nlt", "PROMOTE_TO_MULTI"],
+            *["-lco", "OVERWRITE=YES"],
+            *["-lco", "FID=fid"],
+            *["-lco", "GEOMETRY_NAME=geom"],
+            *["-lco", "LAUNDER=NO"],
+            *["-lco", "SPATIAL_INDEX=NONE"],
+            *["-nln", f"{name}_adm{level}_tmp1"],
+            *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             file,
         ]
     )

@@ -14,22 +14,22 @@ def main(name):
     data = []
     for dest in dests:
         for wld in world_views:
-            for l in range(4, 0, -1):
+            for lvl in range(4, 0, -1):
                 row = {
-                    "id": f"{dest}_{wld}_adm{l}",
+                    "id": f"{dest}_{wld}_adm{lvl}",
                     "grp": dest,
                     "wld": wld,
-                    "adm": l,
+                    "adm": lvl,
                     "date": land_date,
-                    "a_gpkg": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.gpkg.zip",
-                    "a_gdb": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.gdb.zip",
-                    "a_xlsx": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_polygons.xlsx",
-                    "l_gpkg": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_lines.gpkg.zip",
-                    "l_gdb": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_lines.gdb.zip",
-                    "l_xlsx": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_lines.xlsx",
-                    "p_gpkg": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_points.gpkg.zip",
-                    "p_gdb": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_points.gdb.zip",
-                    "p_xlsx": f"{DATA_URL}/{name}/{dest}/{wld}/adm{l}_points.xlsx",
+                    "a_gpkg": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_polygons.gpkg.zip",
+                    "a_gdb": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_polygons.gdb.zip",
+                    "a_xlsx": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_polygons.xlsx",
+                    "l_gpkg": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_lines.gpkg.zip",
+                    "l_gdb": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_lines.gdb.zip",
+                    "l_xlsx": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_lines.xlsx",
+                    "p_gpkg": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_points.gpkg.zip",
+                    "p_gdb": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_points.gdb.zip",
+                    "p_xlsx": f"{DATA_URL}/{name}/{dest}/{wld}/adm{lvl}_points.xlsx",
                 }
                 data.append(row)
     with open((outputs / f"{name}.json"), "w") as f:
@@ -37,5 +37,5 @@ def main(name):
     df = pd.DataFrame(data)
     df["date"] = pd.to_datetime(df["date"])
     df["date"] = df["date"].dt.date
-    df.to_csv(outputs / f"{name}.csv", index=False)
+    df.to_csv(outputs / f"{name}.csv", index=False, encoding="utf-8-sig")
     df.to_excel(outputs / f"{name}.xlsx", index=False)

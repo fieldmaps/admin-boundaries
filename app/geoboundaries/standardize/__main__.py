@@ -1,4 +1,3 @@
-import shutil
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -12,7 +11,6 @@ funcs = [inputs.main, recode.main, outputs.main, cleanup.main]
 
 if __name__ == "__main__":
     logger.info("starting")
-    shutil.rmtree(data, ignore_errors=True)
     data.mkdir(exist_ok=True, parents=True)
     results = []
     pool = Pool()

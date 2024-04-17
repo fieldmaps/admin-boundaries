@@ -6,7 +6,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from psycopg import connect
 
-load_dotenv()
+load_dotenv(override=True)
 
 DATABASE = "app"
 DATA_URL = "https://data.fieldmaps.io"

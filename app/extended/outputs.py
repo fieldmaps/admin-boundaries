@@ -25,8 +25,7 @@ def export_multi(inputs, outputs, name, ext):
         [
             "ogr2ogr",
             "-overwrite",
-            "-lco",
-            "ENCODING=UTF-8",
+            *["-lco", "ENCODING=UTF-8"],
             file,
             gpkg,
         ]

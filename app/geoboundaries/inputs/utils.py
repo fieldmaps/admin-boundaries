@@ -38,7 +38,9 @@ def get_meta():
         lambda x: f"https://www.geoboundaries.org/api/current/gbOpen/{x}/ALL/"
     )
     df = df.sort_values(by=["iso_3", "src_lvl"])
-    df.to_csv(cwd / "../../../inputs/geoboundaries.csv", index=False)
+    df.to_csv(
+        cwd / "../../../inputs/geoboundaries.csv", index=False, encoding="utf-8-sig"
+    )
     return df.to_dict("records")
 
 

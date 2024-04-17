@@ -1,71 +1,49 @@
 import logging
-from os import getenv
 from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
 from psycopg import connect
 
-load_dotenv()
+load_dotenv(override=True)
 
-DATABASE = "app"
-
-cwd = Path(__file__).parent
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-langs = [
-    *["aa", "ab", "ae", "af", "ak", "am", "an", "ar", "as", "av", "ay", "az"],
-    *["ba", "be", "bg", "bh", "bi", "bm", "bn", "bo", "br", "bs", "ca", "ce"],
-    *["ch", "co", "cr", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", "ee"],
-    *["el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr"],
-    *["fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr"],
-    *["ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is"],
-    *["it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn"],
-    *["ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln"],
-    *["lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms"],
-    *["mt", "my", "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv"],
-    *["ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl", "ps", "pt", "qu"],
-    *["rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si", "sk"],
-    *["sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta"],
-    *["te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw"],
-    *["ty", "ug", "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi"],
-    *["yo", "za", "zh", "zu"],
-]
+DATABASE = "app"
+
+cwd = Path(__file__).parent
+id_filter = list(filter(None, map(lambda x: x.lower(), getenv("COD", "").split(","))))
 
 
-def apply_funcs(name, level, row, *args):
+def apply_funcs(name, level, level_max, row, *args):
     conn = connect(f"dbname={DATABASE}", autocommit=True)
     for func in args:
-        func(conn, name, level, row)
+        func(conn, name, level, level_max, row)
     conn.close()
 
 
-def get_cols():
-    result = {}
-    for lvl in range(5, -1, -1):
-        result[f"admin{lvl}Pcode"] = f"ADM{lvl}_PCODE"
-        result[f"admin{lvl}RefName"] = f"ADM{lvl}_REF"
+def get_cols(level: int, row):
+    langs = list(
+        filter(
+            lambda x: isinstance(x, str),
+            [row["src_lang"], row["src_lang1"], row["src_lang2"]],
+        )
+    )
+    result = []
+    for lvl in range(level, -1, -1):
         for lang in langs:
-            result[f"admin{lvl}Name_{lang}"] = f"ADM{lvl}_{lang.upper()}"
-            result[f"admin{lvl}AltName1_{lang}"] = f"ADM{lvl}ALT1{lang.upper()}"
-            result[f"admin{lvl}AltName2_{lang}"] = f"ADM{lvl}ALT2{lang.upper()}"
-    result["date"] = "DATE"
-    result["validOn"] = "VALIDON"
-    result["validTo"] = "VALIDTO"
+            result.append(f"ADM{lvl}_{lang.upper()}")
+        result.append(f"ADM{lvl}_PCODE")
+    result.extend(["DATE", "VALIDON", "VALIDTO"])
     return result
 
 
-def get_ids():
-    ids = getenv("COD", "").split(",")
-    return list(filter(lambda x: x != "", ids))
-
-
 def get_all_meta():
-    dtypes = {"cod_lvl": "Int8"}
+    dtypes = {"cod_lvl": "Int8", "cod_lvl_max": "Int8"}
     df = pd.read_csv(
         cwd / "../../../inputs/meta.csv",
         dtype=dtypes,
@@ -75,6 +53,7 @@ def get_all_meta():
     df = df.rename(
         columns={
             "cod_lvl": "src_lvl",
+            "cod_lvl_max": "src_lvl_max",
             "cod_lang": "src_lang",
             "cod_lang1": "src_lang1",
             "cod_lang2": "src_lang2",
@@ -83,8 +62,10 @@ def get_all_meta():
     df["id"] = df["id"].str[:3]
     df["id"] = df["id"].str.lower()
     df["iso_3"] = df["id"].str.upper()
-    df = df[["id", "iso_3", "src_lvl", "src_lang", "src_lang1", "src_lang2"]]
-    df = df[df["src_lvl"] > 0]
+    df = df[
+        ["id", "iso_3", "src_lvl", "src_lvl_max", "src_lang", "src_lang1", "src_lang2"]
+    ]
+    df = df[df["src_lvl"] >= 0]
     return df.drop_duplicates()
 
 
@@ -92,6 +73,7 @@ def get_src_meta():
     df = pd.read_csv(
         cwd / "../../../inputs/cod.csv", keep_default_na=False, na_values=["", "#N/A"]
     )
+    df = df.drop(columns=["src_api_date", "src_api_update"])
     return df
 
 
@@ -100,9 +82,8 @@ def join_meta(df1, df2):
     return df.to_dict("records")
 
 
-ids = get_ids()
 meta_local = get_all_meta()
 meta_src = get_src_meta()
 adm0_list = join_meta(meta_local, meta_src)
-if len(ids) > 0:
-    adm0_list = filter(lambda x: x["id"] in ids, adm0_list)
+if len(id_filter) > 0:
+    adm0_list = filter(lambda x: x["id"] in id_filter, adm0_list)

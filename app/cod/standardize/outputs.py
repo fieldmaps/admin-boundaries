@@ -29,7 +29,7 @@ def create_export(conn, name, name2, level):
         SQL(query_1).format(
             table_in1=Identifier(f"{name}_adm{level}_00"),
             table_in2=Identifier(f"{name2}_adm{level}_01"),
-            id1=Identifier(f"admin{level}pcode"),
+            id1=Identifier(f"adm{level}_pcode"),
             id2=Identifier(f"adm{level}_src"),
             view_out=Identifier(f"{name2}_adm{level}_02"),
         )

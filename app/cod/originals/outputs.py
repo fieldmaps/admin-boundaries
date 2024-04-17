@@ -3,8 +3,6 @@ import subprocess
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from psycopg.sql import SQL, Identifier
-
 from .utils import DATABASE, logging
 
 logger = logging.getLogger(__name__)
@@ -13,98 +11,64 @@ cwd = Path(__file__).parent
 data = cwd / "../../../data/cod/originals"
 outputs = cwd / "../../../outputs/cod/originals"
 
-query_1 = """
-    DROP VIEW IF EXISTS {view_out};
-    CREATE VIEW {view_out} AS
-    SELECT DISTINCT ON (b.{id2})
-        b.*,
-        a.geom
-    FROM {table_in1} as a
-    LEFT JOIN {table_in2} as b
-    ON a.{id1} = b.{id2};
-"""
-
 
 def export_data(name, level):
-    file = data / f"{name}.gpkg"
-    file.unlink(missing_ok=True)
-    for l in range(level, -1, -1):
+    gpkg = data / f"{name}.gpkg"
+    gdb = data / f"{name}.gdb"
+    gpkg.unlink(missing_ok=True)
+    for lvl in range(level, -1, -1):
         subprocess.run(
             [
                 "ogr2ogr",
                 "-overwrite",
-                "-nln",
-                f"{name}_adm{l}",
-                file,
-                f"PG:dbname={DATABASE}",
-                f"{name}_adm{l}",
+                *["-nln", f"{name}_adm{lvl}"],
+                gpkg,
+                *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}"],
             ]
         )
-
-
-def export_gpkg(name):
-    gpkg = data / f"{name}.gpkg"
-    file = outputs / f"{name}.gpkg.zip"
-    file.unlink(missing_ok=True)
-    with ZipFile(file, "w", ZIP_DEFLATED) as z:
-        z.write(gpkg, gpkg.name)
-
-
-def export_xlsx(name):
-    gpkg = data / f"{name}.gpkg"
-    file = outputs / f"{name}.xlsx"
-    subprocess.run(["ogr2ogr", "-overwrite", file, gpkg])
-
-
-def export_shp(name, level):
-    tmp = outputs / f"{name}_tmp"
-    shutil.rmtree(tmp, ignore_errors=True)
-    tmp.mkdir(exist_ok=True, parents=True)
-    for l in range(level + 1):
-        file = tmp / f"{name}_adm{l}.shp"
         subprocess.run(
             [
-                "pgsql2shp",
-                *["-k", "-q", "-f"],
-                file,
-                DATABASE,
-                f"{name}_adm{l}_shp",
+                "ogr2ogr",
+                "-overwrite",
+                "-unsetFid",
+                *["--config", "OGR_ORGANIZE_POLYGONS", "ONLY_CCW"],
+                *["-f", "OpenFileGDB"],
+                *["-mapFieldType", "Integer64=Real"],
+                *["-nln", f"{name}_adm{lvl}"],
+                gdb,
+                *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}"],
             ]
         )
-    file_zip = outputs / f"{name}.shp.zip"
+
+
+def export_ogr(name, file):
+    gpkg = data / f"{name}.gpkg"
+    subprocess.run(["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg])
+
+
+def zip_file(name, ext, delete=True):
+    file = data / f"{name}.{ext}"
+    file_zip = outputs / f"{name}.{ext}.zip"
     file_zip.unlink(missing_ok=True)
-    with ZipFile(file_zip, "w", ZIP_DEFLATED) as z:
-        for l in range(level, -1, -1):
-            for ext in ["cpg", "dbf", "prj", "shp", "shx"]:
-                file = tmp / f"{name}_adm{l}.{ext}"
-                z.write(file, file.name)
-    shutil.rmtree(tmp, ignore_errors=True)
+    if file.is_file():
+        with ZipFile(file_zip, "w", ZIP_DEFLATED) as z:
+            z.write(file, file.name)
+        if delete:
+            file.unlink(missing_ok=True)
+    if file.is_dir():
+        shutil.make_archive(str(file_zip.with_suffix("")), "zip", file)
+        if delete:
+            shutil.rmtree(file, ignore_errors=True)
 
 
-def main(conn, name, level, _):
+def main(conn, name, level, level_max, _):
+    level = level_max or level
     data.mkdir(exist_ok=True, parents=True)
     outputs.mkdir(exist_ok=True, parents=True)
-    for l in range(level, -1, -1):
-        conn.execute(
-            SQL(query_1).format(
-                table_in1=Identifier(f"{name}_adm{l}_00"),
-                table_in2=Identifier(f"{name}_adm{l}_attr"),
-                id1=Identifier(f"admin{l}Pcode"),
-                id2=Identifier(f"admin{l}Pcode"),
-                view_out=Identifier(f"{name}_adm{l}"),
-            )
-        )
-        conn.execute(
-            SQL(query_1).format(
-                table_in1=Identifier(f"{name}_adm{l}_00"),
-                table_in2=Identifier(f"{name}_adm{l}_attr_shp"),
-                id1=Identifier(f"admin{l}Pcode"),
-                id2=Identifier(f"ADM{l}_PCODE"),
-                view_out=Identifier(f"{name}_adm{l}_shp"),
-            )
-        )
     export_data(name, level)
-    export_gpkg(name)
-    export_shp(name, level)
-    export_xlsx(name)
+    export_ogr(name, data / f"{name}.xlsx")
+    export_ogr(name, outputs / f"{name}.shp.zip")
+    zip_file(name, "gpkg", False)
+    zip_file(name, "gdb")
+    zip_file(name, "xlsx")
     logger.info(name)

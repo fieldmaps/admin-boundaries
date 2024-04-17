@@ -12,6 +12,7 @@ outputs.mkdir(exist_ok=True, parents=True)
 
 def main(row):
     filename = f"{row['iso_3']}_adm{row['src_lvl']}".lower()
+    (outputs / f"{filename}.gpkg").unlink(missing_ok=True)
     subprocess.run(
         [
             "ogr2ogr",

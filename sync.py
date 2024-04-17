@@ -10,19 +10,26 @@ srcs = {
 }
 exts = ["json", "csv", "xlsx"]
 
+
+def upload(src, ext):
+    subprocess.run(
+        [
+            "s3cmd",
+            "sync",
+            "--acl-public",
+            cwd / f"outputs/{src}.{ext}",
+            f"s3://data.fieldmaps.io/{src}.{ext}",
+        ]
+    )
+
+
 if __name__ == "__main__":
     subprocess.run(["python", "-m", "app.meta"])
+    for ext in exts:
+        upload("global-pcodes", ext)
     for src in srcs:
         for ext in exts:
-            subprocess.run(
-                [
-                    "s3cmd",
-                    "sync",
-                    "--acl-public",
-                    cwd / f"outputs/{src}.{ext}",
-                    f"s3://data.fieldmaps.io/{src}.{ext}",
-                ]
-            )
+            upload(src, ext)
         for grp in srcs[src]:
             subprocess.run(
                 [

@@ -1,9 +1,13 @@
 import json
 import logging
+from os import getenv
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 from psycopg import connect
+
+load_dotenv(override=True)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,6 +17,9 @@ logging.basicConfig(
 
 DATABASE = "app"
 cwd = Path(__file__).parent
+id_filter = list(
+    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(",")))
+)
 
 
 def apply_funcs(name, level, row, *args):
@@ -65,3 +72,5 @@ meta_local = get_all_meta()
 meta_src = get_src_meta()
 adm0_list = join_meta(meta_local, meta_src)
 filter_config = get_filter_config()
+if len(id_filter) > 0:
+    adm0_list = filter(lambda x: x["id"] in id_filter, adm0_list)
