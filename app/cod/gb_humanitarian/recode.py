@@ -9,8 +9,8 @@ con = f"postgresql:///{DATABASE}"
 def main(_, name, level, langs, *__):
     query = f"""
         SELECT
-            admin{level}name_{langs[0]} AS Name,
-            admin{level}pcode AS PCode
+            adm{level}_{langs[0]} AS Name,
+            adm{level}_pcode AS PCode
         FROM {name}_adm{level}_00
     """
     df = pd.read_sql_query(query, con)

@@ -20,6 +20,7 @@ def output_ogr(file, dest, wld, l, geom, id, mode):
             *["--config", "OGR_ORGANIZE_POLYGONS", "ONLY_CCW"],
             *["-f", "OpenFileGDB"],
             *["-mapFieldType", "Integer64=Real"],
+            *["-mapFieldType", "Date=DateTime"],
             "-unsetFid",
         ]
         if file.suffix == ".gdb"

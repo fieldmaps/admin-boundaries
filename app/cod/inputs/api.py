@@ -48,6 +48,7 @@ def download(iso_3: str, lvl: int, idx: int | None):
     if success:
         logger.info(filename)
         if not is_polygon(outputs / f"{filename}.gpkg"):
+            (outputs / f"{filename}.gpkg").unlink()
             logger.info(f"NOT POLYGON: {filename}")
     else:
         logger.info(f"NOT DOWNLOADED: {filename}")

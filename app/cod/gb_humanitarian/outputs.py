@@ -59,8 +59,8 @@ def main(conn, name, level, langs, *_):
     conn.execute(
         SQL(query_1).format(
             table_in=Identifier(f"{name}_adm{level}_00"),
-            name=Identifier(f"admin{level}name_{langs[0]}"),
-            pcode=Identifier(f"admin{level}pcode"),
+            name=Identifier(f"adm{level}_{langs[0]}"),
+            pcode=Identifier(f"adm{level}_pcode"),
             level=Literal(f"ADM{level}"),
             view_out=Identifier(f"{name}_adm{level}_01"),
         )
@@ -69,8 +69,7 @@ def main(conn, name, level, langs, *_):
         [
             "ogr2ogr",
             "-overwrite",
-            "-lco",
-            "ENCODING=UTF-8",
+            *["-lco", "ENCODING=UTF-8"],
             file,
             f"PG:dbname={DATABASE}",
             f"{name}_adm{level}_01",

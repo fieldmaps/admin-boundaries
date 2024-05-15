@@ -37,7 +37,7 @@ def create_export(conn, name, name2, level):
     subprocess.run(
         [
             "ogr2ogr",
-            "-append",
+            "-overwrite",
             *["-mapFieldType", "DateTime=Date"],
             *["-nln", f"{name2}_adm{level}"],
             file,

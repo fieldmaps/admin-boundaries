@@ -1,6 +1,10 @@
 import subprocess
 
+srcs = ["cod", "geoboundaries"]
+funcs = ["originals", "standardize"]
+
 if __name__ == "__main__":
-    subprocess.run(["python", "-m", "app.extended"])
-    subprocess.run(["python", "-m", "app.edge_matched"])
-    subprocess.run(["python", "sync.py"])
+    for src in srcs:
+        for func in funcs:
+            subprocess.run(["python", "-m", f"app.{src}.{func}"])
+    subprocess.run(["python", "-m", "app.cod.gb_humanitarian"])

@@ -3,3 +3,4 @@ pandas[excel,sql-other]~=2.2
 psycopg[binary,pool]~=3.1
 psycopg2-binary~=2.9
 python-dotenv~=1.0
+tenacity~=8.3

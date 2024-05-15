@@ -1,9 +1,10 @@
 import logging
-import sqlite3
+from datetime import date
 from pathlib import Path
 
 import httpx
 import pandas as pd
+from tenacity import retry, stop_after_attempt
 
 from .utils import get_all_meta, join_hdx_meta
 
@@ -25,16 +26,29 @@ columns = [
 ]
 
 
-def get_file_meta(iso_3: str, lvl: int):
-    file = cwd / f"../../../inputs/cod/{iso_3}_adm{lvl}.gpkg"
-    if file.is_file():
-        query = f"SELECT * from {iso_3}_adm{lvl};"
-        con = sqlite3.connect(file)
-        df = pd.read_sql_query(query, con)
-        df.columns = df.columns.str.lower()
-        if "date" in df.columns and "validon" in df.columns:
-            return df["date"].iloc[0], df["validon"].iloc[0]
-    return None, None
+@retry(stop=stop_after_attempt(5))
+def get_file_meta(iso_3: str, lvl: int, idx: int | None):
+    if lvl is None:
+        return None, None
+    idx = idx + lvl if idx is not None else lvl
+    path = "COD_External"
+    query = "where=1=1&outFields=date,validon&f=json&resultRecordCount=1&returnGeometry=false"
+    url = f"https://codgis.itos.uga.edu/arcgis/rest/services/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
+    result = httpx.get(url, timeout=60).json()
+    if "error" in result:
+        path = "COD_NO_GEOM_CHECK"
+        url = f"https://codgis.itos.uga.edu/arcgis/rest/services/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
+        result = httpx.get(url, timeout=60).json()
+        if "error" in result:
+            return None, None
+    attrbutes = result["features"][0]["attributes"]
+    if result["geometryType"] != "esriGeometryPolygon":
+        return None, None
+    if attrbutes["date"] is None or attrbutes["validOn"] is None:
+        return None, None
+    src_date = date.fromtimestamp(attrbutes["date"] / 1000)
+    src_update = date.fromtimestamp(attrbutes["validOn"] / 1000)
+    return src_date, src_update
 
 
 def main():
@@ -45,7 +59,9 @@ def main():
         hdx_meta = httpx.get(url).json().get("result")
         if hdx_meta is not None:
             row = join_hdx_meta(row, hdx_meta)
-        src_date, src_update = get_file_meta(row["iso_3"], row["src_lvl"])
+        src_date, src_update = get_file_meta(
+            row["iso_3"], row["src_lvl"], row["src_api_idx"]
+        )
         if src_date is not None and src_update is not None:
             row["src_api_date"] = src_date
             row["src_api_update"] = src_update

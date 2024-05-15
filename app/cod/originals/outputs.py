@@ -34,6 +34,7 @@ def export_data(name, level):
                 *["--config", "OGR_ORGANIZE_POLYGONS", "ONLY_CCW"],
                 *["-f", "OpenFileGDB"],
                 *["-mapFieldType", "Integer64=Real"],
+                *["-mapFieldType", "Date=DateTime"],
                 *["-nln", f"{name}_adm{lvl}"],
                 gdb,
                 *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}"],

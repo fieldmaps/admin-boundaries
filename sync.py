@@ -2,23 +2,34 @@ import subprocess
 from pathlib import Path
 
 cwd = Path(__file__).parent
-srcs = {
-    "edge-matched": ["humanitarian", "open"],
-    "cod": ["extended", "originals"],
-    "geoboundaries": ["extended", "originals"],
-    "gb-humanitarian": ["originals"],
-}
+srcs = ["edge-matched", "cod", "geoboundaries", "gb-humanitarian"]
 exts = ["json", "csv", "xlsx"]
 
 
-def upload(src, ext):
+def sync(src, dest):
     subprocess.run(
         [
-            "s3cmd",
+            "rclone",
             "sync",
-            "--acl-public",
-            cwd / f"outputs/{src}.{ext}",
-            f"s3://data.fieldmaps.io/{src}.{ext}",
+            "--exclude=.*",
+            "--progress",
+            "--s3-no-check-bucket",
+            "--s3-chunk-size=256M",
+            src,
+            dest,
+        ]
+    )
+
+
+def copy(src, dest):
+    subprocess.run(
+        [
+            "rclone",
+            "copyto",
+            "--s3-no-check-bucket",
+            "--s3-chunk-size=256M",
+            src,
+            dest,
         ]
     )
 
@@ -26,21 +37,11 @@ def upload(src, ext):
 if __name__ == "__main__":
     subprocess.run(["python", "-m", "app.meta"])
     for ext in exts:
-        upload("global-pcodes", ext)
+        copy(
+            cwd / f"outputs/global-pcodes.{ext}",
+            f"r2://fieldmaps-data/global-pcodes.{ext}",
+        )
     for src in srcs:
         for ext in exts:
-            upload(src, ext)
-        for grp in srcs[src]:
-            subprocess.run(
-                [
-                    "s3cmd",
-                    "sync",
-                    "--acl-public",
-                    "--delete-removed",
-                    "--rexclude",
-                    r"\/\.",
-                    "--multipart-chunk-size-mb=5120",
-                    cwd / f"outputs/{src}/{grp}",
-                    f"s3://data.fieldmaps.io/{src}/",
-                ]
-            )
+            copy(cwd / f"outputs/{src}.{ext}", f"r2://fieldmaps-data/{src}.{ext}")
+        sync(cwd / f"outputs/{src}", f"r2://fieldmaps-data/{src}")
