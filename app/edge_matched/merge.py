@@ -20,17 +20,12 @@ def merge(dest, wld, lvl, geom):
             subprocess.run(
                 [
                     "ogr2ogr",
-                    "--config",
-                    "PG_USE_COPY",
-                    "YES",
+                    *["--config", "PG_USE_COPY", "YES"],
                     "-append",
-                    "-f",
-                    "PostgreSQL",
-                    "-nln",
-                    f"{dest}_adm{lvl}_{geom}_{wld}",
+                    *["-f", "PostgreSQL"],
+                    *["-nln", f"{dest}_adm{lvl}_{geom}_{wld}"],
                     f"PG:dbname={DATABASE}",
-                    f"PG:dbname={DATABASE}",
-                    f"{dest}_{name}_adm{lvl}_{geom}_{wld}",
+                    *[f"PG:dbname={DATABASE}", f"{dest}_{name}_adm{lvl}_{geom}_{wld}"],
                 ]
             )
     conn = connect(f"dbname={DATABASE}", autocommit=True)
@@ -49,17 +44,12 @@ def merge_polygons(dest, lvl, wld):
         subprocess.run(
             [
                 "ogr2ogr",
-                "--config",
-                "PG_USE_COPY",
-                "YES",
+                *["--config", "PG_USE_COPY", "YES"],
                 "-append",
-                "-f",
-                "PostgreSQL",
-                "-nln",
-                f"{dest}_adm{lvl}_polygons_{wld}",
+                *["-f", "PostgreSQL"],
+                *["-nln", f"{dest}_adm{lvl}_polygons_{wld}"],
                 f"PG:dbname={DATABASE}",
-                f"PG:dbname={DATABASE}",
-                f"{dest}_{name}_adm{l}_polygons_{wld}",
+                *[f"PG:dbname={DATABASE}", f"{dest}_{name}_adm{l}_polygons_{wld}"],
             ]
         )
 

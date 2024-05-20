@@ -1,6 +1,7 @@
 from multiprocessing import Pool
 
 from . import (
+    area,
     attributes,
     cleanup,
     formats,
@@ -110,6 +111,7 @@ if __name__ == "__main__":
     src_admx(cleanup.admx)
     process_boundaries(funcs_cleanup)
     dest_admx(outputs.main, 0)
+    dest_adm0(area.main)
     src_adm0(cleanup.adm0)
     dest_admx(cleanup.dest_admx, 1)
     dest_admx(formats.main, 1)

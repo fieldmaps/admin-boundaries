@@ -1,13 +1,11 @@
 import subprocess
-from pathlib import Path
 
 from psycopg import connect
 from psycopg.sql import SQL, Identifier
 
-from .utils import DATABASE, logging
+from .utils import DATABASE, cwd, logging
 
 logger = logging.getLogger(__name__)
-cwd = Path(__file__).parent
 
 query_1 = """
     ALTER TABLE {table_out}

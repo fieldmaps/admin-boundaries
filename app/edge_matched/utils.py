@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 from psycopg import connect
 
+cwd = Path(__file__).parent
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(message)s",
@@ -27,7 +28,6 @@ def apply_funcs(src, wld, row, *args):
 
 
 def get_meta():
-    cwd = Path(__file__).parent
     df = pd.read_csv(
         cwd / "../../inputs/meta.csv", keep_default_na=False, na_values=["", "#N/A"]
     )

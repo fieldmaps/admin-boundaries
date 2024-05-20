@@ -14,13 +14,12 @@ layer_types = {
 }
 
 
-def output_ogr(file, dest, wld, l, geom, id, mode):
+def output_ogr(file, dest, wld, lvl, geom, id, mode):
     opts = (
         [
             *["--config", "OGR_ORGANIZE_POLYGONS", "ONLY_CCW"],
             *["-f", "OpenFileGDB"],
-            *["-mapFieldType", "Integer64=Real"],
-            *["-mapFieldType", "Date=DateTime"],
+            *["-mapFieldType", "Integer64=Real,Date=DateTime"],
             "-unsetFid",
         ]
         if file.suffix == ".gdb"
@@ -32,7 +31,7 @@ def output_ogr(file, dest, wld, l, geom, id, mode):
             "-makevalid",
             mode,
             *opts,
-            *["-sql", f"SELECT * FROM {dest}_adm{l}_{geom}_{wld} ORDER BY {id};"],
+            *["-sql", f"SELECT * FROM {dest}_adm{lvl}_{geom}_{wld} ORDER BY {id};"],
             *["-nln", file.stem],
             *["-nlt", layer_types[geom]],
             file,
