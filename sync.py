@@ -36,12 +36,12 @@ def copy(src, dest):
 
 if __name__ == "__main__":
     subprocess.run(["python", "-m", "app.meta"])
+    for src in srcs:
+        sync(cwd / f"outputs/{src}", f"r2://fieldmaps-data/{src}")
+        for ext in exts:
+            copy(cwd / f"outputs/{src}.{ext}", f"r2://fieldmaps-data/{src}.{ext}")
     for ext in exts:
         copy(
             cwd / f"outputs/global-pcodes.{ext}",
             f"r2://fieldmaps-data/global-pcodes.{ext}",
         )
-    for src in srcs:
-        for ext in exts:
-            copy(cwd / f"outputs/{src}.{ext}", f"r2://fieldmaps-data/{src}.{ext}")
-        sync(cwd / f"outputs/{src}", f"r2://fieldmaps-data/{src}")
