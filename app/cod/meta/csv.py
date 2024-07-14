@@ -27,6 +27,12 @@ columns = [
 
 
 @retry(stop=stop_after_attempt(5))
+def get_hdx_meta(url):
+    with httpx.Client(http2=True, timeout=60) as client:
+        return client.get(url).json().get("result")
+
+
+@retry(stop=stop_after_attempt(5))
 def get_file_meta(iso_3: str, lvl: int, idx: int | None):
     if lvl is None:
         return None, None
@@ -34,13 +40,14 @@ def get_file_meta(iso_3: str, lvl: int, idx: int | None):
     path = "COD_External"
     query = "where=1=1&outFields=date,validon&f=json&resultRecordCount=1&returnGeometry=false"
     url = f"https://codgis.itos.uga.edu/arcgis/rest/services/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
-    result = httpx.get(url, timeout=60).json()
-    if "error" in result:
-        path = "COD_NO_GEOM_CHECK"
-        url = f"https://codgis.itos.uga.edu/arcgis/rest/services/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
-        result = httpx.get(url, timeout=60).json()
+    with httpx.Client(http2=True, timeout=60) as client:
+        result = client.get(url).json()
         if "error" in result:
-            return None, None
+            path = "COD_NO_GEOM_CHECK"
+            url = f"https://codgis.itos.uga.edu/arcgis/rest/services/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
+            result = client.get(url).json()
+            if "error" in result:
+                return None, None
     attrbutes = result["features"][0]["attributes"]
     if result["geometryType"] != "esriGeometryPolygon":
         return None, None
@@ -51,12 +58,13 @@ def get_file_meta(iso_3: str, lvl: int, idx: int | None):
     return src_date, src_update
 
 
+@retry(stop=stop_after_attempt(5))
 def main():
     cod_meta = get_all_meta(False)
     for row in cod_meta:
         id = f"cod-ab-{row['iso_3'].lower()}"
         url = f"https://data.humdata.org/api/3/action/package_show?id={id}"
-        hdx_meta = httpx.get(url).json().get("result")
+        hdx_meta = get_hdx_meta(url)
         if hdx_meta is not None:
             row = join_hdx_meta(row, hdx_meta)
         src_date, src_update = get_file_meta(

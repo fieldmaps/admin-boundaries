@@ -70,6 +70,8 @@ def get_adm0_list(df0):
         df = df0.copy()
         df = df[df[f"clip_{wld}"] != 0]
         df["id_clip"] = df[f"clip_{wld}"].combine_first(df["id"])
+        df["cod_lvl"] = df["cod_lvl"].replace(0, None)
+        df["geoboundaries_lvl"] = df["geoboundaries_lvl"].replace(0, None)
         df["open_lvl"] = df["geoboundaries_lvl"]
         df["humanitarian_lvl"] = df["cod_lvl"].combine_first(df["open_lvl"])
         result[f"open_{wld}"] = df[df["open_lvl"].isna()]["id_clip"].tolist()

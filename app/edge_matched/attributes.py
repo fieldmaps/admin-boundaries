@@ -70,7 +70,7 @@ def main(conn, dest, wld, row):
     conn.execute(
         SQL(query_4).format(
             table_in1=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}_tmp1"),
-            table_in2=Identifier(f"{dest}_adm0_clip_{wld}"),
+            table_in2=Identifier(f"{dest}_adm0_polygons_{wld}"),
             ids_src=SQL(",").join(map(lambda x: Identifier("a", x), get_src_ids(4, 1))),
             ids_wld=SQL(",").join(map(lambda x: Identifier("b", x), get_wld_ids())),
             table_out=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}"),

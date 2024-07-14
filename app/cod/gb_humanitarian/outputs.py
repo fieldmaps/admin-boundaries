@@ -33,7 +33,7 @@ Canonical Boundary Type Name:
 Source 1: {r['src_name']}
 Source 2: HDX
 Release Type: gbHumanitarian
-License: {r['src_lic']}
+License: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 License Notes:
 License Source: {r['src_url']}
 Link to Source Data: {r['src_url']}

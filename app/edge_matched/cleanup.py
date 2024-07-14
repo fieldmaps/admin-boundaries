@@ -30,6 +30,11 @@ def adm0(dest, wld, geom):
             table_tmp1=Identifier(f"{dest}_adm0_{geom}_{wld}"),
         )
     )
+    conn.execute(
+        SQL(drop_tmp).format(
+            table_tmp1=Identifier(f"{dest}_adm4_polygons_{wld}_area"),
+        )
+    )
     conn.close()
     logger.info(f"{wld}_{geom}")
 

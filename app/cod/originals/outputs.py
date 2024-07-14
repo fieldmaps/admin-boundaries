@@ -41,6 +41,23 @@ def export_data(name, level):
         )
 
 
+def export_geojson(name, level):
+    geojson_data = data / f"{name}.geojson"
+    shutil.rmtree(geojson_data, ignore_errors=True)
+    geojson_data.mkdir(exist_ok=True, parents=True)
+    for lvl in range(level, -1, -1):
+        subprocess.run(
+            [
+                "ogr2ogr",
+                "-overwrite",
+                *["-nln", f"{name}_adm{lvl}"],
+                geojson_data / f"{name}_adm{lvl}.geojson",
+                *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}"],
+            ]
+        )
+    zip_file(name, "geojson")
+
+
 def export_ogr(name, file):
     gpkg = data / f"{name}.gpkg"
     subprocess.run(["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg])
@@ -66,9 +83,9 @@ def main(conn, name, level, level_max, _):
     data.mkdir(exist_ok=True, parents=True)
     outputs.mkdir(exist_ok=True, parents=True)
     export_data(name, level)
-    export_ogr(name, data / f"{name}.xlsx")
+    export_geojson(name, level)
+    export_ogr(name, outputs / f"{name}.xlsx")
     export_ogr(name, outputs / f"{name}.shp.zip")
     zip_file(name, "gpkg", False)
     zip_file(name, "gdb")
-    zip_file(name, "xlsx")
     logger.info(name)

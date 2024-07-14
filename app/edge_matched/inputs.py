@@ -14,8 +14,7 @@ query_1 = """
 
 
 def adm0(dest, wld, geom):
-    land = "osm" if dest == "humanitarian" else "usgs"
-    file = cwd / f"../../../adm0-generator/data/{land}/{wld}/adm0_{geom}.gpkg"
+    file = cwd / f"../../../adm0-generator/data/osm/{wld}/adm0_{geom}.gpkg"
     subprocess.run(
         [
             "ogr2ogr",

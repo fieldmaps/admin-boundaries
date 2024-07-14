@@ -9,16 +9,18 @@ outputs = cwd / "../../outputs"
 
 
 def add_meta(name, df):
-    df["e_gpkg"] = f"{DATA_URL}/{name}/extended/" + df["id"] + ".gpkg.zip"
-    df["e_shp"] = f"{DATA_URL}/{name}/extended/" + df["id"] + ".shp.zip"
-    df["e_xlsx"] = f"{DATA_URL}/{name}/extended/" + df["id"] + ".xlsx.zip"
-    df["o_gpkg"] = (
-        f"{DATA_URL}/{name}/originals/" + df["iso_3"].str.lower() + ".gpkg.zip"
+    df["e_gpkg"] = f"{DATA_URL}/{name}/extended/{df['id']}.gpkg.zip"
+    df["e_shp"] = f"{DATA_URL}/{name}/extended/{df['id']}.shp.zip"
+    df["e_geojson"] = f"{DATA_URL}/{name}/extended/{df['id']}.geojson.zip"
+    df["e_gdb"] = f"{DATA_URL}/{name}/extended/{df['id']}.gdb.zip"
+    df["e_xlsx"] = f"{DATA_URL}/{name}/extended/{df['id']}.xlsx"
+    df["o_gpkg"] = f"{DATA_URL}/{name}/originals/{df['iso_3'].str.lower()}.gpkg.zip"
+    df["o_shp"] = f"{DATA_URL}/{name}/originals/{df['iso_3'].str.lower()}.shp.zip"
+    df["o_geojson"] = (
+        f"{DATA_URL}/{name}/originals/{df['iso_3'].str.lower()}.geojson.zip"
     )
-    df["o_shp"] = f"{DATA_URL}/{name}/originals/" + df["iso_3"].str.lower() + ".shp.zip"
-    df["o_xlsx"] = (
-        f"{DATA_URL}/{name}/originals/" + df["iso_3"].str.lower() + ".xlsx.zip"
-    )
+    df["o_gdb"] = f"{DATA_URL}/{name}/originals/{df['iso_3'].str.lower()}.gdb.zip"
+    df["o_xlsx"] = f"{DATA_URL}/{name}/originals/{df['iso_3'].str.lower()}.xlsx"
     return df
 
 

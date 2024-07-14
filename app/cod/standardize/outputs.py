@@ -25,6 +25,7 @@ query_1 = """
 
 def create_export(conn, name, name2, level):
     file = outputs / f"{name2}.gpkg"
+    file.unlink(missing_ok=True)
     conn.execute(
         SQL(query_1).format(
             table_in1=Identifier(f"{name}_adm{level}_00"),

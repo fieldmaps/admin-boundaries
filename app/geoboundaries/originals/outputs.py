@@ -13,65 +13,78 @@ outputs = cwd / "../../../outputs/geoboundaries/originals"
 
 
 def export_data(name, level):
-    file = data / f"{name}.gpkg"
-    file.unlink(missing_ok=True)
-    for l in range(level, -1, -1):
+    gpkg = data / f"{name}.gpkg"
+    gdb = data / f"{name}.gdb"
+    gpkg.unlink(missing_ok=True)
+    for lvl in range(level, -1, -1):
         subprocess.run(
             [
                 "ogr2ogr",
                 "-overwrite",
-                *["-nln", f"{name}_adm{l}"],
-                file,
-                f"PG:dbname={DATABASE}",
-                f"{name}_adm{l}_01",
+                *["-nln", f"{name}_adm{lvl}"],
+                gpkg,
+                *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}_01"],
             ]
         )
-
-
-def export_gpkg(name):
-    gpkg = data / f"{name}.gpkg"
-    file = outputs / f"{name}.gpkg.zip"
-    file.unlink(missing_ok=True)
-    with ZipFile(file, "w", ZIP_DEFLATED) as z:
-        z.write(gpkg, gpkg.name)
-
-
-def export_shp(name, level):
-    tmp = outputs / f"{name}_tmp"
-    shutil.rmtree(tmp, ignore_errors=True)
-    tmp.mkdir(exist_ok=True, parents=True)
-    for l in range(level + 1):
-        file = tmp / f"{name}_adm{l}.shp"
         subprocess.run(
             [
-                "pgsql2shp",
-                *["-k", "-q", "-f"],
-                file,
-                DATABASE,
-                f"{name}_adm{l}_01",
+                "ogr2ogr",
+                "-overwrite",
+                "-unsetFid",
+                *["--config", "OGR_ORGANIZE_POLYGONS", "ONLY_CCW"],
+                *["-f", "OpenFileGDB"],
+                *["-mapFieldType", "Integer64=Real,Date=DateTime"],
+                *["-nln", f"{name}_adm{lvl}"],
+                gdb,
+                *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}_01"],
             ]
         )
-    file_zip = outputs / f"{name}.shp.zip"
-    file_zip.unlink(missing_ok=True)
-    with ZipFile(file_zip, "w", ZIP_DEFLATED) as z:
-        for l in range(level, -1, -1):
-            for ext in ["cpg", "dbf", "prj", "shp", "shx"]:
-                file = tmp / f"{name}_adm{l}.{ext}"
-                z.write(file, file.name)
-    shutil.rmtree(tmp, ignore_errors=True)
 
 
-def export_xlsx(name):
+def export_geojson(name, level):
+    geojson_data = data / f"{name}.geojson"
+    shutil.rmtree(geojson_data, ignore_errors=True)
+    geojson_data.mkdir(exist_ok=True, parents=True)
+    for lvl in range(level, -1, -1):
+        subprocess.run(
+            [
+                "ogr2ogr",
+                "-overwrite",
+                *["-nln", f"{name}_adm{lvl}"],
+                geojson_data / f"{name}_adm{lvl}.geojson",
+                *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}_01"],
+            ]
+        )
+    zip_file(name, "geojson")
+
+
+def export_ogr(name, file):
     gpkg = data / f"{name}.gpkg"
-    file = outputs / f"{name}.xlsx"
-    subprocess.run(["ogr2ogr", "-overwrite", file, gpkg])
+    subprocess.run(["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg])
+
+
+def zip_file(name, ext, delete=True):
+    file = data / f"{name}.{ext}"
+    file_zip = outputs / f"{name}.{ext}.zip"
+    file_zip.unlink(missing_ok=True)
+    if file.is_file():
+        with ZipFile(file_zip, "w", ZIP_DEFLATED) as z:
+            z.write(file, file.name)
+        if delete:
+            file.unlink(missing_ok=True)
+    if file.is_dir():
+        shutil.make_archive(str(file_zip.with_suffix("")), "zip", file)
+        if delete:
+            shutil.rmtree(file, ignore_errors=True)
 
 
 def main(_, name, level):
     data.mkdir(exist_ok=True, parents=True)
     outputs.mkdir(exist_ok=True, parents=True)
     export_data(name, level)
-    export_gpkg(name)
-    export_shp(name, level)
-    export_xlsx(name)
+    export_geojson(name, level)
+    export_ogr(name, outputs / f"{name}.xlsx")
+    export_ogr(name, outputs / f"{name}.shp.zip")
+    zip_file(name, "gpkg", False)
+    zip_file(name, "gdb")
     logger.info(f"{name}_adm{level}")
