@@ -13,12 +13,13 @@ outputs.mkdir(exist_ok=True, parents=True)
 
 def run(iso_3: str, lvl: int, idx: int | None, filename: str, url: str):
     idx = idx + lvl if idx is not None else lvl
+    query = "f=json&where=1=1&outFields=*&orderByFields=OBJECTID&resultRecordCount=1000"
     return subprocess.run(
         [
             "ogr2ogr",
             "-overwrite",
             "-makevalid",
-            *["--config", "OGR_GEOJSON_MAX_OBJ_SIZE", "2048MB"],
+            *["--config", "OGR_GEOJSON_MAX_OBJ_SIZE", "0"],
             *["-dim", "XY"],
             *["-mapFieldType", "DateTime=Date"],
             *["-nln", filename],
@@ -26,7 +27,7 @@ def run(iso_3: str, lvl: int, idx: int | None, filename: str, url: str):
             *["-oo", "FEATURE_SERVER_PAGING=YES"],
             *["-t_srs", "EPSG:4326"],
             outputs / f"{filename}.gpkg",
-            f"https://codgis.itos.uga.edu/arcgis/rest/services/{url}/{iso_3}_pcode/FeatureServer/{idx}/query?where=1=1&outFields=*&f=json",
+            f"https://codgis.itos.uga.edu/arcgis/rest/services/{url}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}",
         ],
         stderr=subprocess.DEVNULL,
     )

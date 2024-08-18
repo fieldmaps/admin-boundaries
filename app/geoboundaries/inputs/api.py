@@ -18,7 +18,7 @@ def main(row):
             "ogr2ogr",
             "-overwrite",
             "-makevalid",
-            *["--config", "OGR_GEOJSON_MAX_OBJ_SIZE", "2048MB"],
+            *["--config", "OGR_GEOJSON_MAX_OBJ_SIZE", "0"],
             *["-dim", "XY"],
             *["-t_srs", "EPSG:4326"],
             *["-nlt", "PROMOTE_TO_MULTI"],

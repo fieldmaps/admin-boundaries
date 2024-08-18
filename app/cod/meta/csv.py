@@ -12,6 +12,7 @@ cwd = Path(__file__).parent
 
 logger = logging.getLogger(__name__)
 
+NO_DATA = None, None, None
 columns = [
     "iso_3",
     "name",
@@ -23,6 +24,7 @@ columns = [
     "src_name1",
     "src_lic",
     "src_url",
+    "src_api_url",
 ]
 
 
@@ -35,7 +37,7 @@ def get_hdx_meta(url):
 @retry(stop=stop_after_attempt(5))
 def get_file_meta(iso_3: str, lvl: int, idx: int | None):
     if lvl is None:
-        return None, None
+        return NO_DATA
     idx = idx + lvl if idx is not None else lvl
     path = "COD_External"
     query = "where=1=1&outFields=date,validon&f=json&resultRecordCount=1&returnGeometry=false"
@@ -47,15 +49,16 @@ def get_file_meta(iso_3: str, lvl: int, idx: int | None):
             url = f"https://codgis.itos.uga.edu/arcgis/rest/services/{path}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}"
             result = client.get(url).json()
             if "error" in result:
-                return None, None
+                return NO_DATA
     attrbutes = result["features"][0]["attributes"]
     if result["geometryType"] != "esriGeometryPolygon":
-        return None, None
+        return NO_DATA
     if attrbutes["date"] is None or attrbutes["validOn"] is None:
-        return None, None
+        return NO_DATA
     src_date = date.fromtimestamp(attrbutes["date"] / 1000)
     src_update = date.fromtimestamp(attrbutes["validOn"] / 1000)
-    return src_date, src_update
+    src_url = url.split("FeatureServer")[0] + "FeatureServer"
+    return src_date, src_update, src_url
 
 
 @retry(stop=stop_after_attempt(5))
@@ -67,12 +70,14 @@ def main():
         hdx_meta = get_hdx_meta(url)
         if hdx_meta is not None:
             row = join_hdx_meta(row, hdx_meta)
-        src_date, src_update = get_file_meta(
+        src_date, src_update, src_url = get_file_meta(
             row["iso_3"], row["src_lvl"], row["src_api_idx"]
         )
         if src_date is not None and src_update is not None:
             row["src_api_date"] = src_date
             row["src_api_update"] = src_update
+        if src_url is not None:
+            row["src_api_url"] = src_url
         logger.info(row["iso_3"].lower())
     df = pd.DataFrame(cod_meta)
     df = df.drop(columns=["id", "src_lvl", "src_lvl_max", "src_api_idx"])
