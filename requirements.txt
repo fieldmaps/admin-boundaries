@@ -1,5 +1,5 @@
 httpx[http2]~=0.27
-pandas[excel,sql-other]~=2.2
+pandas[performance,excel,sql-other]~=2.2
 psycopg[binary,pool]~=3.2
 psycopg2-binary~=2.9
 python-dotenv~=1.0
