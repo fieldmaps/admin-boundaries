@@ -24,7 +24,8 @@ def export_data(name, level):
                 *["-nln", f"{name}_adm{lvl}"],
                 gpkg,
                 *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}_01"],
-            ]
+            ],
+            check=False,
         )
         subprocess.run(
             [
@@ -37,7 +38,8 @@ def export_data(name, level):
                 *["-nln", f"{name}_adm{lvl}"],
                 gdb,
                 *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}_01"],
-            ]
+            ],
+            check=False,
         )
 
 
@@ -53,14 +55,17 @@ def export_geojson(name, level):
                 *["-nln", f"{name}_adm{lvl}"],
                 geojson_data / f"{name}_adm{lvl}.geojson",
                 *[f"PG:dbname={DATABASE}", f"{name}_adm{lvl}_01"],
-            ]
+            ],
+            check=False,
         )
     zip_file(name, "geojson")
 
 
 def export_ogr(name, file):
     gpkg = data / f"{name}.gpkg"
-    subprocess.run(["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg])
+    subprocess.run(
+        ["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg], check=False,
+    )
 
 
 def zip_file(name, ext, delete=True):

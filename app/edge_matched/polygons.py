@@ -55,22 +55,22 @@ def main(conn, dest, wld, row):
             id=Literal(adm0),
             ids_src=SQL(",").join(map(lambda x: Identifier("a", x), get_src_ids(4))),
             ids_wld=SQL(",").join(
-                map(lambda x: Identifier("a", x), get_wld_ids(False))
+                map(lambda x: Identifier("a", x), get_wld_ids(False)),
             ),
             table_out=Identifier(f"{dest}_{name}_adm{lvl}_polygons_{wld}"),
-        )
+        ),
     )
     for l in range(lvl - 1, -1, -1):
         conn.execute(
             SQL(query_2).format(
-                table_in=Identifier(f"{dest}_{name}_adm{l+1}_polygons_{wld}"),
+                table_in=Identifier(f"{dest}_{name}_adm{l + 1}_polygons_{wld}"),
                 ids_src=SQL(",").join(
-                    map(lambda x: Identifier("a", x), get_src_ids(l))
+                    map(lambda x: Identifier("a", x), get_src_ids(l)),
                 ),
                 ids_wld=SQL(",").join(
-                    map(lambda x: Identifier("a", x), get_wld_ids(False))
+                    map(lambda x: Identifier("a", x), get_wld_ids(False)),
                 ),
                 table_out=Identifier(f"{dest}_{name}_adm{l}_polygons_{wld}"),
-            )
+            ),
         )
     logger.info(f"{dest}_{wld}_{name}")

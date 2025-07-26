@@ -21,7 +21,7 @@ cwd = Path(__file__).parent
 
 def is_polygon(file):
     regex = re.compile(r"\((Multi Polygon|Polygon)\)")
-    result = subprocess.run(["ogrinfo", file], capture_output=True)
+    result = subprocess.run(["ogrinfo", file], check=False, capture_output=True)
     return regex.search(str(result.stdout))
 
 
@@ -57,7 +57,7 @@ def get_all_meta(filtered=True):
             "cod_lang": "src_lang",
             "cod_lang1": "src_lang1",
             "cod_lang2": "src_lang2",
-        }
+        },
     )
     df["id"] = df["id"].str[:3]
     df["id"] = df["id"].str.lower()

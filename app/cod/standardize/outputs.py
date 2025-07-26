@@ -33,7 +33,7 @@ def create_export(conn, name, name2, level):
             id1=Identifier(f"adm{level}_pcode"),
             id2=Identifier(f"adm{level}_src"),
             view_out=Identifier(f"{name2}_adm{level}_02"),
-        )
+        ),
     )
     subprocess.run(
         [
@@ -44,7 +44,8 @@ def create_export(conn, name, name2, level):
             file,
             f"PG:dbname={DATABASE}",
             f"{name2}_adm{level}_02",
-        ]
+        ],
+        check=False,
     )
 
 

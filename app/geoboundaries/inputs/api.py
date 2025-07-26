@@ -25,6 +25,7 @@ def main(row):
             *["-nln", filename],
             outputs / f"{filename}.gpkg",
             row["src_url1"],
-        ]
+        ],
+        check=False,
     )
     logger.info(filename)

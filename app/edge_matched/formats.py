@@ -24,7 +24,24 @@ def export_xlsx(outputs, name):
     gpkg = outputs / f"{name}.gpkg"
     file = outputs / f"{name}.xlsx"
     file.unlink(missing_ok=True)
-    subprocess.run(["ogr2ogr", "-overwrite", file, gpkg])
+    subprocess.run(["ogr2ogr", "-overwrite", file, gpkg], check=False)
+
+
+def export_parquet(outputs, name):
+    gpkg = outputs / f"{name}.gpkg"
+    file = outputs / f"{name}.parquet"
+    file.unlink(missing_ok=True)
+    subprocess.run(
+        [
+            "ogr2ogr",
+            "-overwrite",
+            file,
+            gpkg,
+            *["-lco", "COMPRESSION=ZSTD"],
+            *["-lco", "GEOMETRY_NAME=geometry"],
+        ],
+        check=False,
+    )
 
 
 def cleanup(dest, wld, lvl, geom):
@@ -41,4 +58,5 @@ def main(dest, wld, lvl, geom):
     zip_ogr(outputs, f"{name}.gpkg")
     zip_ogr(outputs, f"{name}.gdb")
     export_xlsx(outputs, name)
+    export_parquet(outputs, name)
     logger.info(f"{dest}_{wld}_adm{lvl}_{geom}")

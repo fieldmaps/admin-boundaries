@@ -23,7 +23,7 @@ def rename_id(df, level):
 
 def get_max_pad(df, level):
     col = f"adm{level}_src"
-    col_higher = f"adm{level-1}_src"
+    col_higher = f"adm{level - 1}_src"
     prev_id = None
     higher_id = None
     id_num = None
@@ -43,7 +43,7 @@ def create_ids(df, name, level, date):
     df["adm0_id"] = f"{name.upper()}-{date.strftime('%Y%m%d')}"
     for l in range(1, level + 1):
         col = f"adm{l}_id"
-        col_higher = f"adm{l-1}_id"
+        col_higher = f"adm{l - 1}_id"
         prev_id = None
         higher_id = None
         id_num = None

@@ -45,7 +45,7 @@ def get_all_meta():
             "cod_lang": "src_lang",
             "cod_lang1": "src_lang1",
             "cod_lang2": "src_lang2",
-        }
+        },
     )
     df["id"] = df["id"].str[:3]
     df["id"] = df["id"].str.lower()
@@ -57,7 +57,9 @@ def get_all_meta():
 
 def get_src_meta():
     df = pd.read_csv(
-        cwd / "../../../inputs/cod.csv", keep_default_na=False, na_values=["", "#N/A"]
+        cwd / "../../../inputs/cod.csv",
+        keep_default_na=False,
+        na_values=["", "#N/A"],
     )
     return df
 

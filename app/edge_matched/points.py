@@ -27,6 +27,6 @@ def main(conn, dest, wld, row):
                 ids_src=SQL(",").join(map(Identifier, get_src_ids(l))),
                 ids_wld=SQL(",").join(map(Identifier, get_wld_ids(False))),
                 table_out=Identifier(f"{dest}_{name}_adm{l}_points_{wld}"),
-            )
+            ),
         )
     logger.info(f"{dest}_{wld}_{name}")

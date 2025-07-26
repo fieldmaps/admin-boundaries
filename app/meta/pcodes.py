@@ -33,14 +33,14 @@ def main():
             "adm1_src": "P-Code",
             "adm1_name": "Name",
             "src_update": "Valid from date",
-        }
+        },
     )
     df = df[cols]
     for lvl in [2, 3, 4]:
         cols_lvl = [
             "iso_3",
             f"adm{lvl}_src",
-            f"adm{lvl-1}_src",
+            f"adm{lvl - 1}_src",
             f"adm{lvl}_name",
             "src_update",
         ]
@@ -48,7 +48,7 @@ def main():
         dfx[f"adm{lvl}_name"] = dfx[f"adm{lvl}_name"].str.replace("\r", "")
         dfx = dfx[~dfx[f"adm{lvl}_src"].isna()]
         dfx["Admin Level"] = lvl
-        dfx["Parent P-Code"] = dfx[f"adm{lvl-1}_src"]
+        dfx["Parent P-Code"] = dfx[f"adm{lvl - 1}_src"]
         dfx = dfx.drop_duplicates()
         dfx = dfx.rename(
             columns={
@@ -56,7 +56,7 @@ def main():
                 f"adm{lvl}_src": "P-Code",
                 f"adm{lvl}_name": "Name",
                 "src_update": "Valid from date",
-            }
+            },
         )
         dfx = dfx[cols]
         df = pd.concat([df, dfx])
@@ -69,6 +69,8 @@ def main():
     df.loc[-1] = hlx
     df = df.sort_index()
     df.to_csv(
-        cwd / "../../outputs/global-pcodes.csv", index=False, encoding="utf-8-sig"
+        cwd / "../../outputs/global-pcodes.csv",
+        index=False,
+        encoding="utf-8-sig",
     )
     df.to_excel(cwd / "../../outputs/global-pcodes.xlsx", index=False)

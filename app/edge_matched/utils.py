@@ -29,7 +29,9 @@ def apply_funcs(src, wld, row, *args):
 
 def get_meta():
     df = pd.read_csv(
-        cwd / "../../inputs/meta.csv", keep_default_na=False, na_values=["", "#N/A"]
+        cwd / "../../inputs/meta.csv",
+        keep_default_na=False,
+        na_values=["", "#N/A"],
     )
     return df
 
@@ -107,7 +109,7 @@ def get_src_ids(level, end=0, attr=True):
                 f"adm{l}_name",
                 f"adm{l}_name1",
                 f"adm{l}_name2",
-            ]
+            ],
         )
     if attr is True:
         ids.extend(
@@ -123,7 +125,7 @@ def get_src_ids(level, end=0, attr=True):
                 "src_lic",
                 "src_url",
                 "src_grp",
-            ]
+            ],
         )
     return ids
 
@@ -138,7 +140,7 @@ def get_wld_ids(adm0=True):
                 "adm0_name",
                 "adm0_name1",
                 "adm0_name2",
-            ]
+            ],
         )
     ids.extend(
         [
@@ -158,7 +160,7 @@ def get_wld_ids(adm0=True):
             "wld_update",
             "wld_view",
             "wld_notes",
-        ]
+        ],
     )
     return ids
 
@@ -178,10 +180,9 @@ def add_col_query(col):
     """
     if col.endswith("_lvl") or col.endswith("_cd"):
         return query_1
-    elif col.endswith("date"):
+    if col.endswith("date"):
         return query_2
-    else:
-        return query_3
+    return query_3
 
 
 meta = get_meta()

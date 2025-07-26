@@ -27,13 +27,14 @@ def adm0(dest, wld, geom):
             *["-nln", f"{dest}_adm0_{geom}_{wld}"],
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             file,
-        ]
+        ],
+        check=False,
     )
     conn = connect(f"dbname={DATABASE}", autocommit=True)
     conn.execute(
         SQL(query_1).format(
             table_out=Identifier(f"{dest}_adm0_{geom}_{wld}"),
-        )
+        ),
     )
     conn.close()
     logger.info(f"{dest}_{wld}_{geom}")
@@ -56,6 +57,7 @@ def admx(src, row):
             *["-nln", f"{src}_{name}_adm{lvl}_voronoi"],
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             file,
-        ]
+        ],
+        check=False,
     )
     logger.info(f"{src}_{name}")

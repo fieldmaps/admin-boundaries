@@ -71,7 +71,9 @@ def main():
         if hdx_meta is not None:
             row = join_hdx_meta(row, hdx_meta)
         src_date, src_update, src_url = get_file_meta(
-            row["iso_3"], row["src_lvl"], row["src_api_idx"]
+            row["iso_3"],
+            row["src_lvl"],
+            row["src_api_idx"],
         )
         if src_date is not None and src_update is not None:
             row["src_api_date"] = src_date

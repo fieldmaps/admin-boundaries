@@ -36,7 +36,9 @@ cols = [
 
 def get_all_meta():
     df = pd.read_csv(
-        cwd / "../../inputs/meta.csv", keep_default_na=False, na_values=["", "#N/A"]
+        cwd / "../../inputs/meta.csv",
+        keep_default_na=False,
+        na_values=["", "#N/A"],
     )
     df["iso_3"] = df["id"].str[:3]
     df["id"] = df["id"].str.lower()
@@ -45,7 +47,9 @@ def get_all_meta():
 
 def get_src_meta(src):
     df = pd.read_csv(
-        cwd / f"../../inputs/{src}.csv", keep_default_na=False, na_values=["", "#N/A"]
+        cwd / f"../../inputs/{src}.csv",
+        keep_default_na=False,
+        na_values=["", "#N/A"],
     )
     df["src_date"] = pd.to_datetime(df["src_date"])
     df["src_update"] = pd.to_datetime(df["src_update"])
@@ -59,7 +63,7 @@ def join_meta(df1, df2, src):
             f"{src}_lang": "src_lang",
             f"{src}_lang1": "src_lang1",
             f"{src}_lang2": "src_lang2",
-        }
+        },
     )
     df = df1.merge(df2, on=join[src])
     df = df[[x for x in cols if x in df.columns]]

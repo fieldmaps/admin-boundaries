@@ -22,7 +22,7 @@ def base(conn, name, level):
             adm_id=Identifier(f"adm{level}_id"),
             adm_name=Identifier(f"adm{level}_name"),
             table_out=Identifier(f"{name}_adm{level}_tmp{level}"),
-        )
+        ),
     )
 
 
@@ -45,13 +45,13 @@ def overlay(conn, name, level):
     for l in range(level - 1, 0, -1):
         conn.execute(
             SQL(query_1).format(
-                table_in1=Identifier(f"{name}_adm{level}_tmp{l+1}"),
+                table_in1=Identifier(f"{name}_adm{level}_tmp{l + 1}"),
                 table_in2=Identifier(f"{name}_adm{l}_00"),
                 adm_id_level=Identifier(f"adm{level}_id"),
                 adm_id=Identifier(f"adm{l}_id"),
                 adm_name=Identifier(f"adm{l}_name"),
                 table_out=Identifier(f"{name}_adm{level}_tmp{l}"),
-            )
+            ),
         )
 
 
@@ -72,7 +72,7 @@ def adm0(conn, name, level):
             table_in1=Identifier(f"{name}_adm{level}_tmp1"),
             table_in2=Identifier(f"{name}_adm0_00"),
             table_out=Identifier(f"{name}_adm{level}_01"),
-        )
+        ),
     )
 
 
@@ -84,7 +84,7 @@ def cleanup(conn, name, level):
         conn.execute(
             SQL(drop_tmp).format(
                 table_tmp1=Identifier(f"{name}_adm{level}_tmp{l}"),
-            )
+            ),
         )
 
 

@@ -26,17 +26,17 @@ query_1 = """
 
 def save_meta(name, level, output):
     r = next(x for x in adm0_list if x["id"] == name)
-    text = f"""Boundary Representative of Year: {r['src_date'][:4]}
-ISO-3166-1 (Alpha-3): {r['iso_3']}
+    text = f"""Boundary Representative of Year: {r["src_date"][:4]}
+ISO-3166-1 (Alpha-3): {r["iso_3"]}
 Boundary Type: ADM{level}
 Canonical Boundary Type Name:
-Source 1: {r['src_name']}
+Source 1: {r["src_name"]}
 Source 2: HDX
 Release Type: gbHumanitarian
 License: Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 License Notes:
-License Source: {r['src_url']}
-Link to Source Data: {r['src_url']}
+License Source: {r["src_url"]}
+Link to Source Data: {r["src_url"]}
 Other Notes: """
     with open(output / "meta.txt", "w") as f:
         f.write(text)
@@ -63,7 +63,7 @@ def main(conn, name, level, langs, *_):
             pcode=Identifier(f"adm{level}_pcode"),
             level=Literal(f"ADM{level}"),
             view_out=Identifier(f"{name}_adm{level}_01"),
-        )
+        ),
     )
     subprocess.run(
         [
@@ -73,7 +73,8 @@ def main(conn, name, level, langs, *_):
             file,
             f"PG:dbname={DATABASE}",
             f"{name}_adm{level}_01",
-        ]
+        ],
+        check=False,
     )
     save_meta(name, level, output)
     compress_output(name, level, output)

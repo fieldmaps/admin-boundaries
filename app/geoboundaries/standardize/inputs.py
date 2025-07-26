@@ -21,5 +21,6 @@ def main(_, name, level, __):
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             file,
             f"{name}_adm{level}",
-        ]
+        ],
+        check=False,
     )

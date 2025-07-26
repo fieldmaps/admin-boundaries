@@ -17,7 +17,7 @@ srcs = ["geoboundaries", "cod"]
 cwd = Path(__file__).parent
 id_cod = list(filter(None, map(lambda x: x.lower(), getenv("COD", "").split(","))))
 id_geoboundaries = list(
-    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(",")))
+    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(","))),
 )
 
 
@@ -29,7 +29,9 @@ def apply_funcs(file, level, *args):
 def get_meta():
     cwd = Path(__file__).parent
     df = pd.read_csv(
-        cwd / "../../inputs/meta.csv", keep_default_na=False, na_values=["", "#N/A"]
+        cwd / "../../inputs/meta.csv",
+        keep_default_na=False,
+        na_values=["", "#N/A"],
     )
     return df
 
@@ -53,5 +55,6 @@ if len(id_cod) > 0:
     input_list["cod"] = filter(lambda x: x["id"] in id_cod, input_list["cod"])
 if len(id_geoboundaries) > 0:
     input_list["geoboundaries"] = filter(
-        lambda x: x["id"] in id_geoboundaries, input_list["geoboundaries"]
+        lambda x: x["id"] in id_geoboundaries,
+        input_list["geoboundaries"],
     )

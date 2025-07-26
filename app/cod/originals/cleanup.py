@@ -19,6 +19,6 @@ def main(conn, name, level, level_max, _):
                 view=Identifier(f"{name}_adm{lvl}"),
                 table_00=Identifier(f"{name}_adm{lvl}_00"),
                 table_tmp1=Identifier(f"{name}_adm{lvl}_tmp1"),
-            )
+            ),
         )
     logger.info(name)

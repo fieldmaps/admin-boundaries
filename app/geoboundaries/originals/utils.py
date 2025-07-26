@@ -17,7 +17,7 @@ logging.basicConfig(
 DATABASE = "app"
 cwd = Path(__file__).parent
 id_filter = list(
-    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(",")))
+    filter(None, map(lambda x: x.lower(), getenv("GEOBOUNDARIES", "").split(","))),
 )
 
 

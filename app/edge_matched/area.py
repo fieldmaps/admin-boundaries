@@ -59,7 +59,7 @@ def main(dest, wld):
         SQL(query_1).format(
             table_in=Identifier(f"{dest}_adm4_polygons_{wld}"),
             table_out=Identifier(f"{dest}_adm4_polygons_{wld}_area"),
-        )
+        ),
     )
     conn.close()
     logger.info("finished")

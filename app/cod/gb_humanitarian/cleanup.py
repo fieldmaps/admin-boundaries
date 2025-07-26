@@ -15,6 +15,6 @@ def main(conn, name, level, *_):
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{name}_adm{level}_01"),
             table_tmp2=Identifier(f"{name}_adm{level}_00"),
-        )
+        ),
     )
     logger.info(f"{name}_adm{level}")

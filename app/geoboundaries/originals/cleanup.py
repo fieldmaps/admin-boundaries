@@ -18,6 +18,6 @@ def main(conn, layer, level):
                 table_tmp1=Identifier(f"{layer}_adm{l}_00"),
                 table_tmp2=Identifier(f"{layer}_adm{l}_01"),
                 table_tmp3=Identifier(f"{layer}_adm{l}_02"),
-            )
+            ),
         )
     logger.info(f"{layer}_adm{level}")

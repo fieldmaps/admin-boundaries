@@ -25,9 +25,9 @@ def main(conn, name, level, level_max, row):
         ids = get_cols(lvl, row)
         conn.execute(
             SQL(query_1).format(
-                table_in=Identifier(f"{name}_adm{lvl+1}"),
+                table_in=Identifier(f"{name}_adm{lvl + 1}"),
                 ids=SQL(",").join(map(Identifier, ids)),
                 table_out=Identifier(f"{name}_adm{lvl}"),
-            )
+            ),
         )
     logger.info(name)

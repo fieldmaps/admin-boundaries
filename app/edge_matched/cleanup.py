@@ -18,7 +18,7 @@ def main(conn, dest, wld, row):
             conn.execute(
                 SQL(drop_tmp).format(
                     table_tmp1=Identifier(f"{dest}_{name}_adm{l}_{geom}_{wld}"),
-                )
+                ),
             )
     logger.info(f"{dest}_{wld}_{name}")
 
@@ -28,12 +28,12 @@ def adm0(dest, wld, geom):
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{dest}_adm0_{geom}_{wld}"),
-        )
+        ),
     )
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{dest}_adm4_polygons_{wld}_area"),
-        )
+        ),
     )
     conn.close()
     logger.info(f"{wld}_{geom}")
@@ -46,7 +46,7 @@ def admx(src, row):
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{src}_{name}_adm{lvl}_voronoi"),
-        )
+        ),
     )
     conn.close()
     logger.info(f"{src}_{name}")
@@ -57,7 +57,7 @@ def dest_admx(dest, wld, lvl, geom):
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{dest}_adm{lvl}_{geom}_{wld}"),
-        )
+        ),
     )
     conn.close()
     logger.info(f"{dest}_{wld}_adm{lvl}_{geom}")

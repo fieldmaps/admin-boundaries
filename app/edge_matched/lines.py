@@ -36,21 +36,21 @@ def main(conn, dest, wld, row):
         conn.execute(
             SQL(query_1).format(
                 table_in1=Identifier(f"{dest}_{name}_adm{l}_polygons_{wld}"),
-                table_in2=Identifier(f"{dest}_{name}_adm{l-1}_polygons_{wld}"),
+                table_in2=Identifier(f"{dest}_{name}_adm{l - 1}_polygons_{wld}"),
                 ids_src=SQL(",").join(
-                    map(lambda x: Identifier("a", x), get_src_ids(l - 1))
+                    map(lambda x: Identifier("a", x), get_src_ids(l - 1)),
                 ),
                 ids_wld=SQL(",").join(
-                    map(lambda x: Identifier("a", x), get_wld_ids(False))
+                    map(lambda x: Identifier("a", x), get_wld_ids(False)),
                 ),
-                id=Identifier(f"adm{l-1}_id"),
+                id=Identifier(f"adm{l - 1}_id"),
                 table_out=Identifier(f"{dest}_{name}_adm{l}_lines_{wld}"),
-            )
+            ),
         )
     conn.execute(
         SQL(query_2).format(
             table_in=Identifier(f"{dest}_{name}_adm0_polygons_{wld}"),
             table_out=Identifier(f"{dest}_{name}_adm0_lines_{wld}"),
-        )
+        ),
     )
     logger.info(f"{dest}_{wld}_{name}")

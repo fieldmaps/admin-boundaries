@@ -36,13 +36,14 @@ def output_ogr(file, dest, wld, lvl, geom, id, mode):
             *["-nlt", layer_types[geom]],
             file,
             f"PG:dbname={DATABASE}",
-        ]
+        ],
+        check=False,
     )
 
 
 def output_geom(file, dest, wld, lvl, geom):
     for l in range(lvl, -1, -1):
-        id = f"adm{l}_id" if geom == "points" else f"adm{l-1}_id"
+        id = f"adm{l}_id" if geom == "points" else f"adm{l - 1}_id"
         id = "adm_id" if geom == "lines" and l == 0 else id
         output_ogr(file, dest, wld, l, geom, id, "-append")
 

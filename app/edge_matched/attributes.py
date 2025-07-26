@@ -47,25 +47,25 @@ def main(conn, dest, wld, row):
         SQL(query_1).format(
             table_in=Identifier(f"{src}_{name}_adm{lvl}_voronoi"),
             table_out=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}_tmp1"),
-        )
+        ),
     )
     conn.execute(
         SQL(query_2).format(
             id_attr=Literal(adm0),
             table_out=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}_tmp1"),
-        )
+        ),
     )
     for id in get_src_ids(4):
         conn.execute(
             SQL(add_col_query(id)).format(
                 name=Identifier(id),
                 table_out=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}_tmp1"),
-            )
+            ),
         )
     conn.execute(
         SQL(query_3).format(
             table_out=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}_tmp1"),
-        )
+        ),
     )
     conn.execute(
         SQL(query_4).format(
@@ -74,11 +74,11 @@ def main(conn, dest, wld, row):
             ids_src=SQL(",").join(map(lambda x: Identifier("a", x), get_src_ids(4, 1))),
             ids_wld=SQL(",").join(map(lambda x: Identifier("b", x), get_wld_ids())),
             table_out=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}"),
-        )
+        ),
     )
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{dest}_{name}_adm{lvl}_voronoi_{wld}_tmp1"),
-        )
+        ),
     )
     logger.info(f"{dest}_{wld}_{name}")

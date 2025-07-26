@@ -22,5 +22,6 @@ def main(_, name, level, *__):
             *["-nln", f"{name}_adm{level}_00"],
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             *[cwd / f"../../../data/cod/originals/{name}.gpkg", f"{name}_adm{level}"],
-        ]
+        ],
+        check=False,
     )

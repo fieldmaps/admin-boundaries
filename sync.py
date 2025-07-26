@@ -17,7 +17,8 @@ def sync(src, dest):
             "--s3-chunk-size=256M",
             src,
             dest,
-        ]
+        ],
+        check=False,
     )
 
 
@@ -30,12 +31,13 @@ def copy(src, dest):
             "--s3-chunk-size=256M",
             src,
             dest,
-        ]
+        ],
+        check=False,
     )
 
 
 if __name__ == "__main__":
-    subprocess.run(["python", "-m", "app.meta"])
+    subprocess.run(["python", "-m", "app.meta"], check=False)
     for src in srcs:
         sync(cwd / f"outputs/{src}", f"r2://fieldmaps-data/{src}")
         for ext in exts:

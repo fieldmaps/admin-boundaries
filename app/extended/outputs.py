@@ -21,7 +21,9 @@ def export_multi(inputs, outputs, name, ext):
     gpkg = inputs / f"{name}.gpkg"
     file = outputs / f"{name}.{ext}"
     file.unlink(missing_ok=True)
-    subprocess.run(["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg])
+    subprocess.run(
+        ["ogr2ogr", "-overwrite", "-lco", "ENCODING=UTF-8", file, gpkg], check=False,
+    )
 
 
 def main(src, name):

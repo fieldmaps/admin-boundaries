@@ -75,30 +75,31 @@ def boundaries(conn, name, level):
             *["-nln", f"{name}_adm{level}_tmp1"],
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             file,
-        ]
+        ],
+        check=False,
     )
     conn.execute(
         SQL(query_1).format(
             table_in=Identifier(f"{name}_adm{level}_tmp1"),
-        )
+        ),
     )
     conn.execute(
         SQL(query_2).format(
             table_in=Identifier(f"{name}_adm{level}_tmp1"),
             table_out=Identifier(f"{name}_adm{level}_00"),
-        )
+        ),
     )
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{name}_adm{level}_tmp1"),
-        )
+        ),
     )
     has_duplicates = (
         conn.execute(
             SQL(query_3).format(
                 table_in=Identifier(f"{name}_adm{level}_00"),
                 id=Identifier("shapeID"),
-            )
+            ),
         ).fetchone()[0]
         > 1
     )

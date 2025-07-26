@@ -26,13 +26,14 @@ def merge(dest, wld, lvl, geom):
                     *["-nln", f"{dest}_adm{lvl}_{geom}_{wld}"],
                     f"PG:dbname={DATABASE}",
                     *[f"PG:dbname={DATABASE}", f"{dest}_{name}_adm{lvl}_{geom}_{wld}"],
-                ]
+                ],
+                check=False,
             )
     conn = connect(f"dbname={DATABASE}", autocommit=True)
     conn.execute(
         SQL(query_1).format(
             table_out=Identifier(f"{dest}_adm{lvl}_{geom}_{wld}"),
-        )
+        ),
     )
     conn.close()
 
@@ -50,7 +51,8 @@ def merge_polygons(dest, lvl, wld):
                 *["-nln", f"{dest}_adm{lvl}_polygons_{wld}"],
                 f"PG:dbname={DATABASE}",
                 *[f"PG:dbname={DATABASE}", f"{dest}_{name}_adm{l}_polygons_{wld}"],
-            ]
+            ],
+            check=False,
         )
 
 

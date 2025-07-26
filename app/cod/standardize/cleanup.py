@@ -19,7 +19,7 @@ def main(conn, name, level, *_):
                     table_tmp1=Identifier(f"{name2}_adm{level}_02"),
                     table_tmp2=Identifier(f"{name2}_adm{level}_01"),
                     table_tmp3=Identifier(f"{name}_adm{level}_00"),
-                )
+                ),
             )
     else:
         conn.execute(
@@ -27,5 +27,5 @@ def main(conn, name, level, *_):
                 table_tmp1=Identifier(f"{name}_adm{level}_02"),
                 table_tmp2=Identifier(f"{name}_adm{level}_01"),
                 table_tmp3=Identifier(f"{name}_adm{level}_00"),
-            )
+            ),
         )

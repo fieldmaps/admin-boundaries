@@ -29,6 +29,7 @@ def run(iso_3: str, lvl: int, idx: int | None, filename: str, url: str):
             outputs / f"{filename}.gpkg",
             f"https://codgis.itos.uga.edu/arcgis/rest/services/{url}/{iso_3}_pcode/FeatureServer/{idx}/query?{query}",
         ],
+        check=False,
         stderr=subprocess.DEVNULL,
     )
 
@@ -41,11 +42,10 @@ def download(iso_3: str, lvl: int, idx: int | None):
         if result.returncode == 0:
             success = True
             break
-        else:
-            result = run(iso_3, lvl, idx, filename, "COD_NO_GEOM_CHECK")
-            if result.returncode == 0:
-                success = True
-                break
+        result = run(iso_3, lvl, idx, filename, "COD_NO_GEOM_CHECK")
+        if result.returncode == 0:
+            success = True
+            break
     if success:
         logger.info(filename)
         if not is_polygon(outputs / f"{filename}.gpkg"):

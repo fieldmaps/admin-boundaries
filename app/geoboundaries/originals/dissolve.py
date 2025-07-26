@@ -30,6 +30,6 @@ def main(conn, name, level):
                 table_in=Identifier(f"{name}_adm{level}_01"),
                 ids=SQL(",").join(map(Identifier, get_ids(l))),
                 table_out=Identifier(f"{name}_adm{l}_01"),
-            )
+            ),
         )
     logger.info(f"{name}_adm{level}")

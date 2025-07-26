@@ -23,6 +23,7 @@ def main(_, name, level, *__):
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             (cwd / f"../../../data/cod/originals/{name}.gpkg"),
             f"{name}_adm{level}",
-        ]
+        ],
+        check=False,
     )
     logger.info(f"{name}_adm{level}")

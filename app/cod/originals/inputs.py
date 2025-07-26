@@ -64,14 +64,15 @@ def run(conn, name, level, row):
             *["-nln", f"{name}_adm{level}_tmp1"],
             *["-f", "PostgreSQL", f"PG:dbname={DATABASE}"],
             file,
-        ]
+        ],
+        check=False,
     )
     conn.execute(
         SQL(query_0).format(
             date=Literal(row["src_date"]),
             update=Literal(row["src_update"]),
             table_out=Identifier(f"{name}_adm{level}_tmp1"),
-        )
+        ),
     )
     for col in ids:
         conn.execute(
@@ -79,26 +80,26 @@ def run(conn, name, level, row):
                 column_old=Identifier(col.lower()),
                 column_new=Identifier(col),
                 table_out=Identifier(f"{name}_adm{level}_tmp1"),
-            )
+            ),
         )
     conn.execute(
         SQL(query_1).format(
             table_in=Identifier(f"{name}_adm{level}_tmp1"),
             ids=SQL(",").join(map(Identifier, ids)),
             table_out=Identifier(f"{name}_adm{level}"),
-        )
+        ),
     )
     conn.execute(
         SQL(drop_tmp).format(
             table_tmp1=Identifier(f"{name}_adm{level}_tmp1"),
-        )
+        ),
     )
     has_duplicates = (
         conn.execute(
             SQL(query_2).format(
                 table_in=Identifier(f"{name}_adm{level}"),
                 id=Identifier(f"ADM{level}_PCODE"),
-            )
+            ),
         ).fetchone()[0]
         > 1
     )

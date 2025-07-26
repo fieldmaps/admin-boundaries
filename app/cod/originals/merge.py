@@ -53,14 +53,14 @@ def main(conn, name, level, level_max, row):
                 SQL(query_1).format(
                     column=Identifier(col),
                     table_out=Identifier(f"{name}_adm{level}"),
-                )
+                ),
             )
         conn.execute(
             SQL(query_2).format(
                 col=Identifier(f"ADM{level}_PCODE"),
                 table_in1=Identifier(f"{name}_adm{level}"),
                 table_in2=Identifier(f"{name}_adm{level_max}"),
-            )
+            ),
         )
         # conn.execute(
         #     SQL(query_2a).format(
@@ -76,18 +76,18 @@ def main(conn, name, level, level_max, row):
                 table_in1=Identifier(f"{name}_adm{level}"),
                 table_in2=Identifier(f"{name}_adm{level_max}"),
                 table_out=Identifier(f"{name}_adm{level_max}_01"),
-            )
+            ),
         )
         conn.execute(
             SQL(drop_tmp).format(
                 table_in1=Identifier(f"{name}_adm{level}"),
                 table_in2=Identifier(f"{name}_adm{level_max}"),
-            )
+            ),
         )
         conn.execute(
             SQL(query_4).format(
                 table_in=Identifier(f"{name}_adm{level_max}_01"),
                 table_out=Identifier(f"{name}_adm{level_max}"),
-            )
+            ),
         )
     logger.info(name)
