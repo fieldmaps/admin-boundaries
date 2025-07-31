@@ -3,6 +3,8 @@ import subprocess
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from geopandas import read_file
+
 from .utils import logging
 
 logger = logging.getLogger(__name__)
@@ -31,16 +33,11 @@ def export_parquet(outputs, name):
     gpkg = outputs / f"{name}.gpkg"
     file = outputs / f"{name}.parquet"
     file.unlink(missing_ok=True)
-    subprocess.run(
-        [
-            "ogr2ogr",
-            "-overwrite",
-            file,
-            gpkg,
-            *["-lco", "COMPRESSION=ZSTD"],
-            *["-lco", "GEOMETRY_NAME=geometry"],
-        ],
-        check=False,
+    read_file(gpkg, use_arrow=True).to_parquet(
+        file,
+        compression="zstd",
+        write_covering_bbox=True,
+        schema_version="1.1.0",
     )
 
 

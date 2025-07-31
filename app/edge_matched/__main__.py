@@ -101,6 +101,14 @@ def dest_admx(func, end):
         result.get()
 
 
+def dest_admx_sync(func, end):
+    for dest in dests:
+        for wld in world_views:
+            for lvl in range(4, end - 1, -1):
+                for geom in geoms:
+                    func(dest, wld, lvl, geom)
+
+
 if __name__ == "__main__":
     logger.info("starting")
     src_adm0(inputs.adm0)
@@ -114,5 +122,5 @@ if __name__ == "__main__":
     dest_adm0(area.main)
     src_adm0(cleanup.adm0)
     dest_admx(cleanup.dest_admx, 1)
-    dest_admx(formats.main, 1)
+    dest_admx_sync(formats.main, 1)
     dest_admx(formats.cleanup, 0)

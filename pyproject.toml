@@ -11,6 +11,8 @@ dependencies = [
     "psycopg2-binary",
     "python-dotenv",
     "tenacity",
+    "geopandas",
+    "pyarrow",
 ]
 
 [dependency-groups]
