@@ -1,0 +1,6 @@
+services:
+  app:
+    build: .
+    volumes:
+      - ./tmp:/srv/tmp
+      - ./outputs:/srv/outputs

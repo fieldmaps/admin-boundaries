@@ -1,6 +1,0 @@
-import subprocess
-
-if __name__ == "__main__":
-    subprocess.run(["python", "-m", "app.extended"], check=False)
-    subprocess.run(["python", "-m", "app.edge_matched"], check=False)
-    subprocess.run(["python", "sync.py"], check=False)

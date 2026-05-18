@@ -1,49 +1,73 @@
-import subprocess
+"""Sync output files to Cloudflare R2 via obstore."""
+
+import logging
+import os
 from pathlib import Path
 
+import obstore as obs
+from dotenv import load_dotenv
+from obstore.store import S3Store
+
+logger = logging.getLogger(__name__)
+
 cwd = Path(__file__).parent
-srcs = ["edge-matched", "cod", "geoboundaries", "gb-humanitarian"]
 exts = ["json", "csv", "xlsx"]
 
+load_dotenv()
 
-def sync(src, dest):
-    subprocess.run(
-        [
-            "rclone",
-            "sync",
-            "--exclude=.*",
-            "--progress",
-            "--s3-no-check-bucket",
-            "--s3-chunk-size=256M",
-            src,
-            dest,
-        ],
-        check=False,
+BUCKET = "fieldmaps-data"
+
+
+def get_store() -> S3Store:
+    """Return an S3Store configured for Cloudflare R2."""
+    return S3Store(
+        BUCKET,
+        config={
+            "endpoint": os.environ["R2_ENDPOINT"],
+            "region": "auto",
+            "access_key_id": os.environ["R2_ACCESS_KEY_ID"],
+            "secret_access_key": os.environ["R2_SECRET_ACCESS_KEY"],
+        },
     )
 
 
-def copy(src, dest):
-    subprocess.run(
-        [
-            "rclone",
-            "copyto",
-            "--s3-no-check-bucket",
-            "--s3-chunk-size=256M",
-            src,
-            dest,
-        ],
-        check=False,
-    )
+def sync(src: Path, dest_prefix: str) -> None:
+    """Upload new/changed local files and delete remote files absent locally."""
+    store = get_store()
+
+    local = {
+        f.relative_to(src): f.stat().st_size
+        for f in src.rglob("*")
+        if f.is_file() and not f.name.startswith(".")
+    }
+
+    remote = {
+        Path(obj["path"]).relative_to(dest_prefix): obj["size"]
+        for obj in obs.list(store, prefix=dest_prefix).collect()
+    }
+
+    for rel, size in local.items():
+        if remote.get(rel) != size:
+            key = f"{dest_prefix}/{rel}"
+            obs.put(store, key, src / rel)
+            logger.info("uploaded: %s", key)
+
+    for rel in remote:
+        if rel not in local:
+            key = f"{dest_prefix}/{rel}"
+            obs.delete(store, key)
+            logger.info("deleted: %s", key)
+
+
+def copy(src: Path, dest_key: str) -> None:
+    """Upload a single file to the given R2 key."""
+    store = get_store()
+    obs.put(store, dest_key, src)
+    logger.info("copied: %s", dest_key)
 
 
 if __name__ == "__main__":
-    subprocess.run(["python", "-m", "app.meta"], check=False)
-    for src in srcs:
-        sync(cwd / f"outputs/{src}", f"r2://fieldmaps-data/{src}")
-        for ext in exts:
-            copy(cwd / f"outputs/{src}.{ext}", f"r2://fieldmaps-data/{src}.{ext}")
+    sync(cwd / "outputs/edge-matched", "edge-matched")
     for ext in exts:
-        copy(
-            cwd / f"outputs/global-pcodes.{ext}",
-            f"r2://fieldmaps-data/global-pcodes.{ext}",
-        )
+        copy(cwd / f"outputs/edge-matched.{ext}", f"edge-matched.{ext}")
+        copy(cwd / f"outputs/global-pcodes.{ext}", f"global-pcodes.{ext}")
