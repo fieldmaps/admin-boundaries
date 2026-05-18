@@ -1,5 +1,6 @@
 __pycache__
-.claude/settings.local.json
+.claude/*
+!.claude/settings.json
 .ruff_cache
 .venv
 tmp/
