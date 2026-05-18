@@ -6,6 +6,9 @@ from pathlib import Path
 PARQUET_OPTS = "(COMPRESSION ZSTD, COMPRESSION_LEVEL 15, GEOPARQUET_VERSION V2)"
 os.environ["OGR_ORGANIZE_POLYGONS"] = "ONLY_CCW"
 
+_BOOL_VALS = ("YES", "ON", "TRUE", "1")
+DEBUG: bool = os.getenv("DEBUG", "").upper() in _BOOL_VALS
+
 PKG_DIR = Path(__file__).parent
 TMP_DIR = PKG_DIR.parent / "tmp"
 OUTPUTS_DIR = PKG_DIR.parent / "outputs"

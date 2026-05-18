@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = ["duckdb", "httpx[http2]"]
+dependencies = ["duckdb", "httpx[http2]", "psutil"]
 
 [dependency-groups]
 dev = ["obstore", "python-dotenv", "ruff"]

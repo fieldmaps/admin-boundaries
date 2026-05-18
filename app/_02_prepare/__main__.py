@@ -2,6 +2,9 @@
 
 from logging import getLogger
 
+import app.config
+from app.utils import export_debug_tables
+
 from . import _01_hdx, _02_fallbacks
 from .utils import get_conn
 
@@ -14,6 +17,8 @@ def main() -> None:
     conn = get_conn("prepare", reset=False)
     _02_fallbacks.load_cod(conn, cod_meta_iso3s)
     _02_fallbacks.load_geoboundaries(conn)
+    if app.config.DEBUG:
+        export_debug_tables(conn)
     conn.close()
     logger.info("inputs done")
 

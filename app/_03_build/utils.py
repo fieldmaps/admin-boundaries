@@ -2,7 +2,9 @@
 
 import duckdb
 
+import app.config
 from app.config import BUILD_DB
+from app.utils import ProfiledConnection
 
 
 def describe(conn: duckdb.DuckDBPyConnection, table: str) -> list[str]:
@@ -73,12 +75,15 @@ def all_output_cols(level: int) -> list[str]:
     return src_id_cols(level) + src_meta_cols()
 
 
-def open_build_conn(*, reset: bool = False) -> duckdb.DuckDBPyConnection:
-    """Open the shared build DuckDB at tmp/build.duckdb."""
+def open_build_conn(*, reset: bool = False) -> duckdb.DuckDBPyConnection | ProfiledConnection:
+    """Open the shared build DuckDB at tmp/build.duckdb.
+
+    Returns a ProfiledConnection when DEBUG is enabled.
+    """
     BUILD_DB.parent.mkdir(parents=True, exist_ok=True)
     if reset:
         BUILD_DB.unlink(missing_ok=True)
     conn = duckdb.connect(str(BUILD_DB))
     conn.execute("LOAD spatial;")
     conn.execute("LOAD httpfs;")
-    return conn
+    return ProfiledConnection(conn) if app.config.DEBUG else conn

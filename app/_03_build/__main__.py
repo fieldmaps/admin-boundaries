@@ -7,7 +7,9 @@ iteration.
 
 from logging import getLogger
 
+import app.config
 from app.config import WLD
+from app.utils import export_debug_tables
 
 from . import _01_inputs, _02_clip, _03_lines, _04_points, _05_attributes
 from .utils import open_build_conn
@@ -29,6 +31,8 @@ def main() -> None:
     _04_points.generate_points(conn)
     _05_attributes.main(conn)
 
+    if app.config.DEBUG:
+        export_debug_tables(conn)
     conn.close()
     logger.info("build done")
 

@@ -62,3 +62,7 @@ uv run -m app
 uv run -m app --step _01_download
 uv run ruff check && uv run ruff format
 ```
+
+## Editing Notes
+
+A PostToolUse ruff hook runs automatically after every file write or edit. Because ruff removes unused imports immediately, **always include the usage of a new import in the same Edit/Write call** — never add imports in one edit and their usage in a follow-up edit, or ruff will strip them between the two calls.

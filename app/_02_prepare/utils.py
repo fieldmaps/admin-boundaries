@@ -4,7 +4,9 @@ from pathlib import Path
 
 import duckdb
 
+import app.config
 from app.config import TMP_DIR
+from app.utils import ProfiledConnection
 
 
 def load_metadata(meta_csv: Path) -> dict:
@@ -40,11 +42,14 @@ def load_metadata(meta_csv: Path) -> dict:
     }
 
 
-def get_conn(name: str, *, reset: bool = True) -> duckdb.DuckDBPyConnection:
+def get_conn(
+    name: str, *, reset: bool = True
+) -> duckdb.DuckDBPyConnection | ProfiledConnection:
     """Open a file-based DuckDB connection at tmp/{name}.duckdb.
 
     With reset=True (default), the file is deleted first so the connection
     starts on a clean slate. Loads spatial and httpfs extensions.
+    Returns a ProfiledConnection when DEBUG is enabled.
     """
     db_path = TMP_DIR / f"{name}.duckdb"
     TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -56,4 +61,4 @@ def get_conn(name: str, *, reset: bool = True) -> duckdb.DuckDBPyConnection:
     conn.execute("SET enable_progress_bar = false")
     conn.execute("SET geometry_always_xy = true")
     conn.execute("SET preserve_insertion_order = false")
-    return conn
+    return ProfiledConnection(conn) if app.config.DEBUG else conn
