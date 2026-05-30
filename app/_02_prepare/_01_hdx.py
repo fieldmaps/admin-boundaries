@@ -50,7 +50,7 @@ CREATE OR REPLACE TABLE metadata (
 """
 
 
-def main(conn: duckdb.DuckDBPyConnection) -> None:
+def load_hdx(conn: duckdb.DuckDBPyConnection) -> None:
     """Build admin + metadata tables in prepare.duckdb from the extracted HDX GDB.
 
     Assumes the GDB has already been downloaded and extracted by _01_download.
