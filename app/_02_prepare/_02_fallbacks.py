@@ -7,15 +7,19 @@ import httpx
 
 from app.config import HTTP_TIMEOUT
 
-from .config import COD_BASE, GB_API, GB_BASE
+from .config import COD_BASE, COD_LIST_URL, GB_BASE, GB_LIST_URL
 
 logger = getLogger(__name__)
 
 
-def load_cod(conn: duckdb.DuckDBPyConnection, cod_meta_iso3s: set[str]) -> set[str]:
-    """Insert COD fallback countries (in HDX metadata CSV but not yet in admin)."""
+def load_cod(conn: duckdb.DuckDBPyConnection) -> set[str]:
+    """Insert COD fallback countries (in curated list but not yet in admin)."""
     covered = {row[0] for row in conn.execute("SELECT iso3 FROM metadata").fetchall()}
-    todo = sorted(cod_meta_iso3s - covered)
+    with httpx.Client(follow_redirects=True, timeout=HTTP_TIMEOUT) as client:
+        r = client.get(COD_LIST_URL)
+        r.raise_for_status()
+    cod_iso3s = {row["iso_3"] for row in r.json() if row.get("iso_3")}
+    todo = sorted(cod_iso3s - covered)
     admin_cols = _admin_cols(conn)
     inserted: set[str] = set()
     for iso3 in todo:
@@ -30,9 +34,9 @@ def load_geoboundaries(conn: duckdb.DuckDBPyConnection) -> set[str]:
     """Insert GeoBoundaries countries not already covered by HDX or COD fallback."""
     covered = {row[0] for row in conn.execute("SELECT iso3 FROM metadata").fetchall()}
     with httpx.Client(follow_redirects=True, timeout=HTTP_TIMEOUT) as client:
-        r = client.get(GB_API)
+        r = client.get(GB_LIST_URL)
         r.raise_for_status()
-    gb_iso3s = {row["boundaryISO"] for row in r.json() if row.get("boundaryISO")}
+    gb_iso3s = {row["iso_3"] for row in r.json() if row.get("iso_3")}
     todo = sorted(gb_iso3s - covered)
     admin_cols = _admin_cols(conn)
     inserted: set[str] = set()

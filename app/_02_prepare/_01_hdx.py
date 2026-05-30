@@ -51,32 +51,21 @@ CREATE OR REPLACE TABLE metadata (
 """
 
 
-def main() -> set[str]:
+def main() -> None:
     """Build admin + metadata tables in prepare.duckdb from the extracted HDX GDB.
 
     Assumes the GDB has already been downloaded and extracted by _01_download.
-    Returns the full set of COD-AB iso3 codes from the HDX metadata CSV
-    (used downstream to compute the COD fallback set).
     """
     meta_csv = HDX_DIR / f"{META_NAME}.csv"
 
     conn = get_conn(PREPARE_DB, reset=True)
     conn.execute(ADMIN_SCHEMA_SQL)
     conn.execute(METADATA_SCHEMA_SQL)
-
-    logger.info("loading HDX metadata")
     metadata = load_metadata(meta_csv)
     _load_metadata_table(conn, metadata)
-
-    logger.info("loading HDX admin4 → admin (via ST_Read on GDB)")
     _load_admin_table(conn)
-
-    logger.info("generating hierarchical IDs")
     conn.execute(_id_gen_ctas_sql())
-
     conn.close()
-    logger.info("HDX → prepare.duckdb done")
-    return set(metadata.keys())
 
 
 def _id_gen_ctas_sql() -> str:
