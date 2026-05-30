@@ -181,7 +181,7 @@ def _load_admin_table(conn: duckdb.DuckDBPyConnection) -> None:
                m.src_name, m.src_name1, m.src_lic,
                '{HDX_SRC_URL}' AS src_url,
                'COD' AS src_grp,
-               a.geom
+               a.geometry AS geom
         FROM ST_Read('{HDX_GDB_DIR}', layer='admin4') a
         JOIN metadata m ON m.iso3 = a.iso3
         WHERE m.src = 'hdx'

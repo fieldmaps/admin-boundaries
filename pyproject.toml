@@ -11,7 +11,5 @@ dev = ["obstore", "python-dotenv", "ruff"]
 
 [tool.ruff]
 fix = true
-
-[tool.ruff.lint]
-select = ["ALL"]
-ignore = ["COM812", "D203", "D213", "S608"]
+lint.select = ["ALL"]
+lint.ignore = ["COM812", "D203", "D213", "S603", "S607", "S608"]

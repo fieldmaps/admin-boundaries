@@ -12,7 +12,7 @@ app/_04_export/      → write GeoParquets, format conversions, area stats, and 
 sync.py              → rclone push to Cloudflare R2 (standalone, NOT invoked by pipeline)
 ```
 
-Entry point: `uv run python -m app` (all stages). Single stage: `uv run python -m app --step _01_download` (or `_02_prepare`, `_03_build`, `_04_export`); also honors `STEP` env var.
+Entry point: `uv run -m app` (all stages). Single stage: `uv run -m app --step _01_download` (or `_02_prepare`, `_03_build`, `_04_export`); also honors `STEP` env var.
 
 ## Data Sources and Priority
 

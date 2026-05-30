@@ -71,7 +71,8 @@ def _insert_remote(
     """Stage a remote parquet, insert into admin + metadata. Return True on success."""
     try:
         conn.execute(
-            f"CREATE OR REPLACE TEMP TABLE stage AS SELECT * FROM read_parquet('{url}')"
+            "CREATE OR REPLACE TEMP TABLE stage AS "
+            f"SELECT * FROM read_parquet('{url}')",
         )
     except duckdb.Error as e:
         logger.warning("%s: failed to read %s (%s)", iso3, url, e)

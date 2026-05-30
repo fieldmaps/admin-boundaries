@@ -1,5 +1,7 @@
 """Shared utilities for the build stage."""
 
+from typing import cast
+
 import duckdb
 
 import app.config
@@ -75,10 +77,13 @@ def all_output_cols(level: int) -> list[str]:
     return src_id_cols(level) + src_meta_cols()
 
 
-def open_build_conn(*, reset: bool = False) -> duckdb.DuckDBPyConnection | ProfiledConnection:
+def open_build_conn(
+    *,
+    reset: bool = False,
+) -> duckdb.DuckDBPyConnection:
     """Open the shared build DuckDB at tmp/build.duckdb.
 
-    Returns a ProfiledConnection when DEBUG is enabled.
+    Returns a ProfiledConnection (cast to DuckDBPyConnection) when DEBUG is enabled.
     """
     BUILD_DB.parent.mkdir(parents=True, exist_ok=True)
     if reset:
@@ -86,4 +91,6 @@ def open_build_conn(*, reset: bool = False) -> duckdb.DuckDBPyConnection | Profi
     conn = duckdb.connect(str(BUILD_DB))
     conn.execute("LOAD spatial;")
     conn.execute("LOAD httpfs;")
-    return ProfiledConnection(conn) if app.config.DEBUG else conn
+    if app.config.DEBUG:
+        return cast(duckdb.DuckDBPyConnection, ProfiledConnection(conn))
+    return conn

@@ -57,7 +57,7 @@ def main() -> None:
         )
         dfx["area_km"] = dfx["area_km"].astype(int)
         dfx.to_excel(
-            out_dir / f"area_{lvl}.xlsx", sheet_name=f"area_{lvl}", index=False
+            out_dir / f"area_{lvl}.xlsx", sheet_name=f"area_{lvl}", index=False,
         )
 
     logger.info("area stats written for %s", WLD)

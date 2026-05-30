@@ -108,7 +108,7 @@ def export_debug_tables(conn: DuckDBPyConnection, only: set[str] | None = None) 
     app.config.TMP_DIR.mkdir(parents=True, exist_ok=True)
     tables = conn.execute(
         "SELECT table_name FROM information_schema.tables "
-        "WHERE table_schema = 'main' ORDER BY table_name"
+        "WHERE table_schema = 'main' ORDER BY table_name",
     ).fetchall()
     for (table,) in tables:
         if only is not None and table not in only:
@@ -116,7 +116,7 @@ def export_debug_tables(conn: DuckDBPyConnection, only: set[str] | None = None) 
         out = str(app.config.TMP_DIR / f"{table}.parquet")
         has_geom = conn.execute(
             "SELECT COUNT(*) > 0 FROM information_schema.columns "
-            f"WHERE table_name = '{table}' AND data_type = 'GEOMETRY'"
+            f"WHERE table_name = '{table}' AND data_type = 'GEOMETRY'",
         ).fetchall()[0][0]
         opts = _GEO_PARQUET if has_geom else _PLAIN_PARQUET
         conn.execute(f"COPY \"{table}\" TO '{out}' {opts}")

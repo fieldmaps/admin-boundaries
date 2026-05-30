@@ -43,7 +43,7 @@ def generate_lines(conn: duckdb.DuckDBPyConnection) -> None:
 
 
 def _attr_select(
-    conn: duckdb.DuckDBPyConnection, table: str, level: int, prefix: str = ""
+    conn: duckdb.DuckDBPyConnection, table: str, level: int, prefix: str = "",
 ) -> str:
     """Return a comma-joined SQL column list (src_id + meta cols) present in `table`."""
     cols = describe(conn, table)

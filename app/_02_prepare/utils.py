@@ -1,6 +1,7 @@
 """Shared utilities for the prepare (ingest) stage."""
 
 from pathlib import Path
+from typing import cast
 
 import duckdb
 
@@ -43,13 +44,13 @@ def load_metadata(meta_csv: Path) -> dict:
 
 
 def get_conn(
-    name: str, *, reset: bool = True
-) -> duckdb.DuckDBPyConnection | ProfiledConnection:
+    name: str, *, reset: bool = True,
+) -> duckdb.DuckDBPyConnection:
     """Open a file-based DuckDB connection at tmp/{name}.duckdb.
 
     With reset=True (default), the file is deleted first so the connection
     starts on a clean slate. Loads spatial and httpfs extensions.
-    Returns a ProfiledConnection when DEBUG is enabled.
+    Returns a ProfiledConnection (cast to DuckDBPyConnection) when DEBUG is enabled.
     """
     db_path = TMP_DIR / f"{name}.duckdb"
     TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -61,4 +62,6 @@ def get_conn(
     conn.execute("SET enable_progress_bar = false")
     conn.execute("SET geometry_always_xy = true")
     conn.execute("SET preserve_insertion_order = false")
-    return ProfiledConnection(conn) if app.config.DEBUG else conn
+    if app.config.DEBUG:
+        return cast(duckdb.DuckDBPyConnection, ProfiledConnection(conn))
+    return conn
