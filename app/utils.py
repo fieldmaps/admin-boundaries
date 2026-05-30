@@ -136,9 +136,14 @@ class _EagerResult:
         return None
 
 
-def export_debug_tables(conn: DuckDBPyConnection, only: set[str] | None = None) -> None:
-    """Export all pipeline tables to tmp/*.parquet for post-run inspection."""
-    app.config.TMP_DIR.mkdir(parents=True, exist_ok=True)
+def export_debug_tables(
+    conn: DuckDBPyConnection,
+    subdir: str,
+    only: set[str] | None = None,
+) -> None:
+    """Export all pipeline tables to tmp/<subdir>/*.parquet for post-run inspection."""
+    out_dir = app.config.TMP_DIR / subdir
+    out_dir.mkdir(parents=True, exist_ok=True)
     tables = conn.execute(
         "SELECT table_name FROM information_schema.tables "
         "WHERE table_schema = 'main' ORDER BY table_name",
@@ -146,7 +151,7 @@ def export_debug_tables(conn: DuckDBPyConnection, only: set[str] | None = None) 
     for (table,) in tables:
         if only is not None and table not in only:
             continue
-        out = str(app.config.TMP_DIR / f"{table}.parquet")
+        out = str(out_dir / f"{table}.parquet")
         has_geom = conn.execute(
             "SELECT COUNT(*) > 0 FROM information_schema.columns "
             f"WHERE table_name = '{table}' AND data_type = 'GEOMETRY'",

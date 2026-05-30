@@ -31,7 +31,7 @@ def main() -> None:
     _05_attributes.main(conn)
 
     if app.config.DEBUG:
-        export_debug_tables(conn)
+        export_debug_tables(conn, "build")
     conn.close()
     logger.info("build done")
 

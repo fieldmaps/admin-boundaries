@@ -5,8 +5,7 @@ from logging import getLogger
 import duckdb
 
 from app._01_download.config import META_NAME
-from app.config import HDX_DIR, PREPARE_DB
-from app.utils import get_conn
+from app.config import HDX_DIR
 
 from .config import HDX_GDB_DIR, HDX_SRC_URL
 from .utils import load_metadata
@@ -51,21 +50,18 @@ CREATE OR REPLACE TABLE metadata (
 """
 
 
-def main() -> None:
+def main(conn: duckdb.DuckDBPyConnection) -> None:
     """Build admin + metadata tables in prepare.duckdb from the extracted HDX GDB.
 
     Assumes the GDB has already been downloaded and extracted by _01_download.
     """
     meta_csv = HDX_DIR / f"{META_NAME}.csv"
-
-    conn = get_conn(PREPARE_DB, reset=True)
     conn.execute(ADMIN_SCHEMA_SQL)
     conn.execute(METADATA_SCHEMA_SQL)
     metadata = load_metadata(meta_csv)
     _load_metadata_table(conn, metadata)
     _load_admin_table(conn)
     conn.execute(_id_gen_ctas_sql())
-    conn.close()
 
 
 def _id_gen_ctas_sql() -> str:
