@@ -2,9 +2,8 @@
 
 from logging import getLogger
 
-import duckdb
-
 from app.config import EDGE_MATCHED_DIR, WLD
+from app.utils import get_conn
 
 from .config import AREA_CRS
 
@@ -20,8 +19,7 @@ def main() -> None:
     out_dir = EDGE_MATCHED_DIR / WLD
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    conn = duckdb.connect()
-    conn.execute("LOAD spatial;")
+    conn = get_conn()
     df = conn.execute(f"""--sql
         SELECT
             adm4_id, adm3_id, adm2_id, adm1_id, adm0_id, iso_3,
@@ -57,7 +55,9 @@ def main() -> None:
         )
         dfx["area_km"] = dfx["area_km"].astype(int)
         dfx.to_excel(
-            out_dir / f"area_{lvl}.xlsx", sheet_name=f"area_{lvl}", index=False,
+            out_dir / f"area_{lvl}.xlsx",
+            sheet_name=f"area_{lvl}",
+            index=False,
         )
 
     logger.info("area stats written for %s", WLD)

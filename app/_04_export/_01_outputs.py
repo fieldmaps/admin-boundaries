@@ -5,14 +5,14 @@ from logging import getLogger
 import duckdb
 
 from app.config import BUILD_DB, EDGE_MATCHED_DIR, GEOMS, PARQUET_OPTS, WLD
+from app.utils import get_conn
 
 logger = getLogger(__name__)
 
 
 def main() -> None:
     """Write outputs/edge-matched/{WLD}/adm{N}_{geom}.parquet for every table."""
-    conn = duckdb.connect(str(BUILD_DB), read_only=True)
-    conn.execute("LOAD spatial;")
+    conn = get_conn(BUILD_DB, read_only=True)
     try:
         out_dir = EDGE_MATCHED_DIR / WLD
         out_dir.mkdir(parents=True, exist_ok=True)

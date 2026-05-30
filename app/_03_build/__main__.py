@@ -8,11 +8,10 @@ iteration.
 from logging import getLogger
 
 import app.config
-from app.config import WLD
-from app.utils import export_debug_tables
+from app.config import BUILD_DB, WLD
+from app.utils import export_debug_tables, get_conn
 
 from . import _01_inputs, _02_clip, _03_lines, _04_points, _05_attributes
-from .utils import open_build_conn
 
 logger = getLogger(__name__)
 
@@ -20,7 +19,7 @@ logger = getLogger(__name__)
 def main() -> None:
     """Run the global build stage end-to-end."""
     logger.info("starting build (wld=%s)", WLD)
-    conn = open_build_conn(reset=True)
+    conn = get_conn(BUILD_DB, reset=True)
 
     _01_inputs.load_adm0_clip(conn)
     _01_inputs.load_adm0_wld(conn)

@@ -5,10 +5,11 @@ from logging import getLogger
 import duckdb
 
 from app._01_download.config import META_NAME
-from app.config import HDX_DIR
+from app.config import HDX_DIR, PREPARE_DB
+from app.utils import get_conn
 
 from .config import HDX_GDB_DIR, HDX_SRC_URL
-from .utils import get_conn, load_metadata
+from .utils import load_metadata
 
 logger = getLogger(__name__)
 
@@ -59,7 +60,7 @@ def main() -> set[str]:
     """
     meta_csv = HDX_DIR / f"{META_NAME}.csv"
 
-    conn = get_conn("prepare", reset=True)
+    conn = get_conn(PREPARE_DB, reset=True)
     conn.execute(ADMIN_SCHEMA_SQL)
     conn.execute(METADATA_SCHEMA_SQL)
 

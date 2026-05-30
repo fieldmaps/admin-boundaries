@@ -3,9 +3,8 @@
 import csv
 from json import dump
 
-import duckdb
-
 from app.config import OUTPUTS_DIR, WLD
+from app.utils import get_conn
 
 from .config import DATA_URL
 from .utils import get_land_date
@@ -45,8 +44,7 @@ def main(name: str) -> None:
         writer.writerows(data)
     xlsx = OUTPUTS_DIR / f"{name}.xlsx"
     xlsx.unlink(missing_ok=True)
-    conn = duckdb.connect()
-    conn.execute("LOAD spatial;")
+    conn = get_conn()
     conn.execute(f"""--sql
         COPY (SELECT * REPLACE (CAST(date AS DATE) AS date) FROM read_csv('{csv_path}'))
         TO '{xlsx}' (FORMAT GDAL, DRIVER 'XLSX')

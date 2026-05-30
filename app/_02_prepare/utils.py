@@ -1,18 +1,13 @@
 """Shared utilities for the prepare (ingest) stage."""
 
 from pathlib import Path
-from typing import cast
 
-import duckdb
-
-import app.config
-from app.config import TMP_DIR
-from app.utils import ProfiledConnection
+from app.utils import get_conn
 
 
 def load_metadata(meta_csv: Path) -> dict:
     """Return {iso3: row_dict} with standardized field names from the metadata CSV."""
-    conn = duckdb.connect()
+    conn = get_conn()
     rows = conn.execute(f"""--sql
         SELECT
             country_iso3 AS iso3,
@@ -41,27 +36,3 @@ def load_metadata(meta_csv: Path) -> dict:
         for row in rows
         if row[0] is not None
     }
-
-
-def get_conn(
-    name: str, *, reset: bool = True,
-) -> duckdb.DuckDBPyConnection:
-    """Open a file-based DuckDB connection at tmp/{name}.duckdb.
-
-    With reset=True (default), the file is deleted first so the connection
-    starts on a clean slate. Loads spatial and httpfs extensions.
-    Returns a ProfiledConnection (cast to DuckDBPyConnection) when DEBUG is enabled.
-    """
-    db_path = TMP_DIR / f"{name}.duckdb"
-    TMP_DIR.mkdir(parents=True, exist_ok=True)
-    if reset:
-        db_path.unlink(missing_ok=True)
-    conn = duckdb.connect(str(db_path))
-    conn.execute("LOAD spatial;")
-    conn.execute("LOAD httpfs;")
-    conn.execute("SET enable_progress_bar = false")
-    conn.execute("SET geometry_always_xy = true")
-    conn.execute("SET preserve_insertion_order = false")
-    if app.config.DEBUG:
-        return cast(duckdb.DuckDBPyConnection, ProfiledConnection(conn))
-    return conn

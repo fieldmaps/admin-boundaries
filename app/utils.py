@@ -5,13 +5,46 @@ import re
 import threading
 import time
 from logging import getLogger
+from pathlib import Path
+from typing import cast
 
+import duckdb
 import psutil
 from duckdb import DuckDBPyConnection
 
 import app.config
 
 logger = getLogger(__name__)
+
+
+def get_conn(
+    path: Path | None = None,
+    *,
+    reset: bool = False,
+    read_only: bool = False,
+) -> DuckDBPyConnection:
+    """Open a DuckDB connection, loading spatial and httpfs.
+
+    path=None → in-memory; path=Path → file at that location.
+    reset=True deletes the file first (no-op for in-memory).
+    Returns a ProfiledConnection (cast to DuckDBPyConnection) when DEBUG is enabled.
+    """
+    if path is None:
+        conn = duckdb.connect()
+    else:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if reset:
+            path.unlink(missing_ok=True)
+        conn = duckdb.connect(str(path), read_only=read_only)
+    conn.execute("LOAD spatial;")
+    conn.execute("LOAD httpfs;")
+    conn.execute("SET enable_progress_bar = false")
+    conn.execute("SET geometry_always_xy = true")
+    conn.execute("SET preserve_insertion_order = false")
+    if app.config.DEBUG:
+        return cast("DuckDBPyConnection", ProfiledConnection(conn))
+    return conn
+
 
 _PROCESS = psutil.Process()
 _MEM_Q = "SELECT COALESCE(SUM(memory_usage_bytes), 0) FROM duckdb_memory()"

@@ -1,12 +1,6 @@
 """Shared utilities for the build stage."""
 
-from typing import cast
-
 import duckdb
-
-import app.config
-from app.config import BUILD_DB
-from app.utils import ProfiledConnection
 
 
 def describe(conn: duckdb.DuckDBPyConnection, table: str) -> list[str]:
@@ -75,22 +69,3 @@ def wld_cols() -> list[str]:
 def all_output_cols(level: int) -> list[str]:
     """Return all output columns for a given admin level."""
     return src_id_cols(level) + src_meta_cols()
-
-
-def open_build_conn(
-    *,
-    reset: bool = False,
-) -> duckdb.DuckDBPyConnection:
-    """Open the shared build DuckDB at tmp/build.duckdb.
-
-    Returns a ProfiledConnection (cast to DuckDBPyConnection) when DEBUG is enabled.
-    """
-    BUILD_DB.parent.mkdir(parents=True, exist_ok=True)
-    if reset:
-        BUILD_DB.unlink(missing_ok=True)
-    conn = duckdb.connect(str(BUILD_DB))
-    conn.execute("LOAD spatial;")
-    conn.execute("LOAD httpfs;")
-    if app.config.DEBUG:
-        return cast(duckdb.DuckDBPyConnection, ProfiledConnection(conn))
-    return conn
