@@ -16,6 +16,13 @@ _STEPS = (
     ("_04_export", _04_export.main),
 )
 
+_ALIASES = {
+    "download": "_01_download",
+    "prepare": "_02_prepare",
+    "build": "_03_build",
+    "export": "_04_export",
+}
+
 _BOOL_VALS = ("YES", "ON", "TRUE", "1")
 
 
@@ -35,7 +42,8 @@ def _parse() -> str | None:
     parser.add_argument(
         "--step",
         default=getenv("STEP"),
-        choices=[name for name, _ in _STEPS],
+        choices=[name for name, _ in _STEPS] + list(_ALIASES),
+        metavar="{download,prepare,build,export}",
         help="Run only the named stage (default: run all).",
     )
     parser.add_argument(
@@ -48,7 +56,7 @@ def _parse() -> str | None:
     )
     args = parser.parse_args()
     _config.DEBUG = args.debug or bool(args.step)
-    return args.step
+    return _ALIASES.get(args.step, args.step)
 
 
 if __name__ == "__main__":
