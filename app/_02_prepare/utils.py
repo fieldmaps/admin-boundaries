@@ -4,7 +4,9 @@ from logging import getLogger
 from pathlib import Path
 
 import duckdb
+import httpx
 
+from app.config import HTTP_TIMEOUT
 from app.utils import get_conn
 
 logger = getLogger(__name__)
@@ -41,6 +43,29 @@ def load_metadata(meta_csv: Path) -> dict:
         for row in rows
         if row[0] is not None
     }
+
+
+def load_fallback(
+    conn: duckdb.DuckDBPyConnection,
+    list_url: str,
+    base_url: str,
+    src_label: str,
+) -> set[str]:
+    """Insert fallback countries from a curated list not yet in admin."""
+    covered = {row[0] for row in conn.execute("SELECT iso3 FROM metadata").fetchall()}
+    with httpx.Client(follow_redirects=True, timeout=HTTP_TIMEOUT) as client:
+        r = client.get(list_url)
+        r.raise_for_status()
+    todo = [row for row in r.json() if row.get("iso_3") and row["iso_3"] not in covered]
+    cols = admin_cols(conn)
+    inserted: set[str] = set()
+    for row in todo:
+        iso3, src_id = row["iso_3"], row["id"]
+        url = f"{base_url}/{src_id}.parquet"
+        if insert_remote(conn, iso3, url, src_label, cols):
+            inserted.add(iso3)
+    logger.info("%s: %s/%s countries inserted", src_label, len(inserted), len(todo))
+    return inserted
 
 
 def admin_cols(conn: duckdb.DuckDBPyConnection) -> list[str]:
